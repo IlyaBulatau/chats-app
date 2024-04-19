@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from settings import BASE_DIR
 
+
 router = APIRouter(tags=["chats"], prefix="/chats")
 templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 

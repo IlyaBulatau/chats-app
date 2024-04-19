@@ -33,17 +33,18 @@ skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-line-length = 80
 
-[lint.flake8-annotations]
-allow-star-arg-any = true
+[lint.flake8-unused-arguments]
+ignore-variadic-names = true
 
 [lint.isort]
 case-sensitive = true
 force-sort-within-sections = true
 lines-after-imports = 2
-lines-between-types = 1
 relative-imports-order = "closest-to-furthest"
 section-order = ["standard-library", "third-party", "app"]
 
 [lint.isort.sections]
-"third-party" = ["fastapi", "sqlalchemy", "pydantic"]
 "app" = ["auth", "core", "interfaces", "settings", "chats"]
+
+[lint.pylint]
+max-args = 12

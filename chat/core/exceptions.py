@@ -1,4 +1,4 @@
-class CustomException(Exception):
+class CustomException(Exception):  # noqa: N818
     message = None
 
     def __init__(self, message=None, *args, field=None, **kwargs):
@@ -10,15 +10,18 @@ class CustomException(Exception):
 class InCorrectUsername(CustomException):
     pass
 
+
 class InCorrectPassword(CustomException):
     pass
+
 
 class MismatchPassword(CustomException):
     pass
 
+
 class EmptyField(CustomException):
     message = "Поле не может быть пустым"
 
+
 class AccountNotExists(CustomException):
     message = "Аккаунт не найден"
-    

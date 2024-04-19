@@ -14,7 +14,7 @@ user_table = db.Table(
     Column("username", db.String(cons.USERNAME_LENGHT), unique=True, nullable=False, index=True),
     Column("password", db.String, nullable=False),
     Column("created_at", db.DateTime, server_default=db.sql.func.now(), nullable=False),
-    Column("updated_at", db.DateTime, onupdate=db.sql.func.now(), nullable=True)
+    Column("updated_at", db.DateTime, onupdate=db.sql.func.now(), nullable=True),
 )
 
 

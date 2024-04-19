@@ -1,11 +1,11 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from settings import BASE_DIR
-from core.database.tables import setup_mapper
+from auth.endpoints import router as auth_router
 from chats.endpoints import router as chat_router
 from chats.ws import router as ws_chats_router
-from auth.endpoints import router as auth_router
+from core.database.tables import setup_mapper
+from settings import BASE_DIR
 
 
 app = FastAPI(title="Chats App")
@@ -23,5 +23,6 @@ def include_routers(app: FastAPI, routers: list[APIRouter]) -> None:
 @app.on_event("startup")
 async def startup():
     setup_mapper()
+
 
 include_routers(app, ROUTERS)

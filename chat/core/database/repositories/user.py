@@ -1,9 +1,9 @@
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert
 
-from interfaces.repository import BaseRepository
 from core.domains import User
 from core.dto.users import UserRegistryDTO
+from interfaces.repository import BaseRepository
 
 
 class UserRepository(BaseRepository):
@@ -17,7 +17,7 @@ class UserRepository(BaseRepository):
         created_user: User = result.scalar()
 
         return created_user
-    
+
     @classmethod
     async def get(cls, session: AsyncSession, **kwargs) -> User | None:
         smtp = select(cls.model).filter_by(**kwargs)
@@ -27,5 +27,5 @@ class UserRepository(BaseRepository):
 
         if not user:
             return None
-    
+
         return user

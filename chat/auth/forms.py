@@ -1,12 +1,11 @@
 from pydantic import field_validator, model_validator
 
-from interfaces.form import BaseForm
-from auth.validators import UsernameValidatorField, PasswordValidatorField
+from auth.validators import PasswordValidatorField, UsernameValidatorField
 from core.exceptions import EmptyField
+from interfaces.form import BaseForm
 
 
 class RegisterForm(BaseForm):
-
     username: str
     password1: str
     password2: str
@@ -18,7 +17,7 @@ class RegisterForm(BaseForm):
             raise EmptyField(field="username")
         UsernameValidatorField.validate(username)
         return username
-    
+
     @model_validator(mode="before")
     @classmethod
     def password_validate(cls, data):
@@ -29,8 +28,9 @@ class RegisterForm(BaseForm):
             raise EmptyField(field="password")
         PasswordValidatorField.validate(password1)
         PasswordValidatorField.has_match_password(password1, password2)
-        
+
         return data
+
 
 class AuthorizationForm(BaseForm):
     username: str
@@ -43,7 +43,7 @@ class AuthorizationForm(BaseForm):
             raise EmptyField(field="username")
         UsernameValidatorField.validate(username)
         return username
-    
+
     @field_validator("password", mode="before")
     @classmethod
     def password_validate(cls, password: str) -> str:

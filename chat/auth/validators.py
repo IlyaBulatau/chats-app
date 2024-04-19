@@ -1,6 +1,6 @@
-from interfaces.validator import BaseValidatorField
-from core.exceptions import InCorrectUsername, InCorrectPassword, MismatchPassword
 from core.constancies import USERNAME_LENGHT
+from core.exceptions import InCorrectPassword, InCorrectUsername, MismatchPassword
+from interfaces.validator import BaseValidatorField
 
 
 class UsernameValidatorField(BaseValidatorField):
@@ -9,7 +9,10 @@ class UsernameValidatorField(BaseValidatorField):
     @classmethod
     def is_valid_lenght(cls, username) -> None:
         if not (cls.MIN_LENGHT < len(username) <= USERNAME_LENGHT):
-            raise InCorrectUsername(f"Длинна имени должна быть больше в пределах {cls.MIN_LENGHT}-{USERNAME_LENGHT} символов", field="username")
+            raise InCorrectUsername(
+                f"Длинна имени должна быть больше в пределах {cls.MIN_LENGHT}-{USERNAME_LENGHT} символов",
+                field="username",
+            )
 
     @classmethod
     def is_string(cls, username) -> None:
@@ -24,7 +27,7 @@ class PasswordValidatorField(BaseValidatorField):
     def is_valid_lenght(cls, password) -> None:
         if len(password) < cls.MIN_LENGHT:
             raise InCorrectPassword(f"Длинна пароля должна быть более {cls.MIN_LENGHT} символов", field="password")
-    
+
     @classmethod
     def is_have_digit(cls, password) -> None:
         for letter in password:
