@@ -1,0 +1,4 @@
+- id: ruff
+  name: ruff
+  entry: ruff check --fix
+  language: python
