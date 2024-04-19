@@ -1,0 +1,50 @@
+exclude = [
+    ".pytest_cache",
+    "migrations",
+    "tests"
+]
+
+line-length = 120
+target-version = "py310"
+show-fixes = true
+unsafe-fixes = true
+
+[lint]
+select = [
+    "A",
+    "E",
+    "F",
+    "ISC",
+    "I",
+    "N",
+    "PIE",
+    "T20",
+    "RET",
+    "SLF",
+    "SIM",
+    "ARG",
+    "ERA",
+    "PL",
+]
+
+[format]
+quote-style = "double"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-line-length = 80
+
+[lint.flake8-annotations]
+allow-star-arg-any = true
+
+[lint.isort]
+case-sensitive = true
+force-sort-within-sections = true
+length-sort = true
+lines-after-imports = 2
+order-by-type = true
+relative-imports-order = "closest-to-furthest"
+
+[lint.isort.sections]
+"auth" = ["auth"]
+"core" = ["core"]
+"interfaces" = ["interfaces"]
