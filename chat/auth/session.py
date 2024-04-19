@@ -1,0 +1,35 @@
+from dataclasses import dataclass, asdict
+from datetime import datetime
+
+from fastapi import Response
+import jwt
+
+from settings import SESSION_SETTINGS
+from core.utils import dt_to_str, str_to_dt
+
+
+class Session:
+
+    def set_cookie(self, response: Response, payload: "Payload") -> None:
+        response.set_cookie(SESSION_SETTINGS.auth_key, self._generate_session_token(payload))
+    
+    def _generate_session_token(self, payload: "Payload") -> str:
+        payload_dict = payload.to_dict()
+        payload_dict["timestamp"] = dt_to_str(payload_dict["timestamp"])
+        token = jwt.encode(payload=payload_dict, key=SESSION_SETTINGS.secret, algorithm=SESSION_SETTINGS.algorithm)
+        return token
+    
+    def get_payload(self, token: str) -> "Payload":
+        payload = jwt.decode(token, key=SESSION_SETTINGS.secret, algorithms=SESSION_SETTINGS.algorithm)
+        return Payload(
+            user_id=payload["user_id"],
+            timestamp=str_to_dt(payload["timestamp"])
+        )
+
+@dataclass
+class Payload:
+    user_id: int
+    timestamp: datetime # forever only datetime
+
+    def to_dict(self) -> dict:
+        return asdict(self)

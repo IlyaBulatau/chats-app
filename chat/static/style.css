@@ -1,0 +1,11 @@
+input {
+    display: inline;
+}
+
+label {
+    display: block;
+}
+
+button {
+    display: block;
+}
