@@ -39,12 +39,11 @@ allow-star-arg-any = true
 [lint.isort]
 case-sensitive = true
 force-sort-within-sections = true
-length-sort = true
 lines-after-imports = 2
-order-by-type = true
+lines-between-types = 1
 relative-imports-order = "closest-to-furthest"
+section-order = ["standard-library", "third-party", "app"]
 
 [lint.isort.sections]
-"auth" = ["auth"]
-"core" = ["core"]
-"interfaces" = ["interfaces"]
+"third-party" = ["fastapi", "sqlalchemy", "pydantic"]
+"app" = ["auth", "core", "interfaces", "settings", "chats"]
