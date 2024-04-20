@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.forms import AuthorizationForm, RegisterForm
-from auth.user import Authorization, Registraton
+from auth.user import Authorization, Registration
 from core.database.connect import get_db
 from core.database.repositories.user import UserRepository
 from core.exceptions import CustomException
@@ -45,7 +45,7 @@ async def register_method(
         context = {"errors": {exc.field: exc.message}}
         return templates.TemplateResponse(request=request, name="register.html", context=context)
 
-    registration_user = Registraton(form, user_repo, db_session)
+    registration_user = Registration(form, user_repo, db_session)
     await registration_user()
 
     return RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)

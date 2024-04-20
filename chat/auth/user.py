@@ -13,7 +13,7 @@ from core.exceptions import AccountNotExists, InCorrectPassword
 from settings import SESSION_SETTINGS
 
 
-class Registraton:
+class Registration:
     def __init__(self, registry_user: RegisterForm, user_repository: UserRepository, db_session: AsyncSession):
         self.registry_form: RegisterForm = registry_user
         self.user_repository: UserRepository = user_repository

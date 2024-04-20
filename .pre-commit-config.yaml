@@ -6,10 +6,11 @@ repos:
         entry: ruff check --fix
         language: system
         types: [ python ]
-
+        exclude: ^(migrations/|tests/)
 
       - id: ruff-format
         name: ruff-format
         entry: ruff format
         language: system
         types: [ python ]
+        exclude: ^(migrations/|tests/)
