@@ -1,4 +1,5 @@
 import pytest
+from pytest_factoryboy import register 
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.sql import text
@@ -10,9 +11,18 @@ from chat.main import app, setup_mapper
 from chat.settings import DB_SETTINGS
 from chat.core.database.connect import get_db
 from chat.core.database.tables import mapper_registry
+from tests.factories.users import UserFactory
 
 
 TEST_DB_NAME = "test_chat"
+
+
+register(UserFactory)
+
+@pytest.fixture(scope="session", autouse=True)
+def set_session_provider_facotry(db_session):
+    """Добавляет обьект сесси к фабрикам"""
+    UserFactory.set_session(db_session)
 
 
 @pytest.fixture(scope="session")
@@ -52,6 +62,7 @@ async def clear_tables(session: AsyncSession):
     async with session() as async_session:
         await async_session.execute(clear_query)
         await async_session.commit()
+
 
 @pytest.fixture(scope="session")
 def event_loop():
