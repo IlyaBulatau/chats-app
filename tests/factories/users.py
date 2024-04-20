@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from chat.auth.forms import RegisterForm
 from core.domains import User # type: ignore
-from chat.auth.password import hash_password
 
 
 faker = Faker()
