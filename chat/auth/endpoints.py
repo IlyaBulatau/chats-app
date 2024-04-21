@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.decorators import login_required
+from auth.decorators import login_required, not_login
 from auth.forms import AuthorizationForm, RegisterForm
 from auth.user import Authorization, Registration, user_logout
 from core.database.connect import get_db
@@ -18,16 +18,19 @@ templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 
 @router.get("/register", response_class=HTMLResponse)
+@not_login
 async def register_page(request: Request):
     return templates.TemplateResponse(request=request, name="register.html")
 
 
 @router.get("/authorization", response_class=HTMLResponse)
+@not_login
 async def authorization_page(request: Request):
     return templates.TemplateResponse(request=request, name="authorization.html")
 
 
 @router.post("/register", response_class=HTMLResponse)
+@not_login
 async def register_method(
     request: Request,
     username: str | None = Form(None),
@@ -53,6 +56,7 @@ async def register_method(
 
 
 @router.post("/authorization", response_class=HTMLResponse)
+@not_login
 async def authorization_method(
     request: Request,
     username: str | None = Form(None),

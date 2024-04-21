@@ -19,3 +19,18 @@ def login_required(controller: Coroutine):
         return await controller(*args, **kwargs)
 
     return wrapper
+
+
+def not_login(controller: Coroutine):
+    """Только для не авторизаванных"""
+
+    @wraps(controller)
+    async def wrapper(*args, **kwargs):
+        request = kwargs.get("request")
+
+        if await is_authenticated(request):
+            return RedirectResponse(request.url_for("index"))
+
+        return await controller(*args, **kwargs)
+
+    return wrapper

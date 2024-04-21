@@ -2,6 +2,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from auth.endpoints import router as auth_router
+from auth.middlewares import AddCurrentUserToRequestMiddleware
 from chats.endpoints import router as chat_router
 from chats.ws import router as ws_chats_router
 from core.database.tables import setup_mapper
@@ -26,3 +27,5 @@ async def startup():
 
 
 include_routers(app, ROUTERS)
+
+app.add_middleware(AddCurrentUserToRequestMiddleware)

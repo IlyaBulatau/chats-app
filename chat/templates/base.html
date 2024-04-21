@@ -30,9 +30,13 @@
                         <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false" href="#"><i class="bi bi-person-circle"></i></a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            {% if request.state._state.user %}
+                            <li><form action="{{ url_for('logout_method') }}" method="post"><button class="btn btn-link">Выйти</button></form></li>
+                            {% else %}
                             <li><a class="dropdown-item" href="{{ url_for('register_page') }}">Регистрация</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('authorization_page') }}">Авторизация</a></li>
-                            <li><form action="{{ url_for('logout_method') }}" method="post"><button class="btn btn-link">Выйти</button></form></li>
+                            {% endif %}
+                            
                         </ul>
                     </li>
                 </ul>
