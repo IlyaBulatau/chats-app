@@ -25,3 +25,7 @@ class EmptyField(CustomException):
 
 class AccountNotExists(CustomException):
     message = "Аккаунт не найден"
+
+
+class IsExistsUser(CustomException):
+    message = "Пользователь уже существует"

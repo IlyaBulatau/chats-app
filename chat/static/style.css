@@ -1,12 +1,12 @@
 html {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 body {
     font-family: 'Roboto', sans-serif;
 }
 
-input {
+/* input {
     display: inline;
 }
 
@@ -16,4 +16,24 @@ label {
 
 button {
     display: block;
+} */
+
+.register {
+    background-color: #f0f0f1;
+    margin-top: 40px;
+    box-shadow:  1px 1px 10px -3px hsl(0, 0%, 22%);
+}
+
+.register h3 {
+    margin-top: 90px;
+}
+
+.register form {
+    margin-top: 40px;
+    margin-bottom: 150px;
+}
+
+
+.field {
+    margin-bottom: 15px;
 }

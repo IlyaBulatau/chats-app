@@ -45,12 +45,11 @@ async def register_method(
 
     try:
         form = RegisterForm(username=username, password1=password1, password2=password2)
+        registration_user = Registration(form, user_repo, db_session)
+        await registration_user()
     except CustomException as exc:
         context = {"errors": {exc.field: exc.message}}
         return templates.TemplateResponse(request=request, name="register.html", context=context)
-
-    registration_user = Registration(form, user_repo, db_session)
-    await registration_user()
 
     return RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)
 

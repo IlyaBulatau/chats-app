@@ -5,25 +5,42 @@
 
 {% block content %}
 
-<h1>Страница регистрации</h1>
-<div>
-    <form action="register" method="post">
-        <label for="username">Имя пользователя</label>
-        <input id="username" name="username" type="text">
-        {% if errors %}
-        {{ errors.username }}
-        {% endif %}
-
-        <label for="password1">Пароль</label>
-        <input type="password" name="password1" id="password1">
-        {% if errors %}
-        {{ errors.password }}
-        {% endif %}
-
-        <label for="password2">Повторите пароль</label>
-        <input type="password" name="password2" id="password1">
-        
-        <button>Регистрации</button>
-    </form>
-</div> 
+<section class="register mx-auto" style="width: 800px;">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3 class="text-center">Регистрация</h3>
+                <form action="register" method="post" role="form" class="form-horizontal">
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
+                            <label for="username" class="control-label">Имя пользователя</label>
+                            <input class="form-control" id="username" name="username" type="text">
+                            {% if errors %}
+                            <p class="help-block text-danger">{{ errors.username }}</p>
+                            {% endif %}
+                        </div> 
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
+                            <label for="password1" class="control-label">Пароль</label>
+                            <input class="form-control" type="password" name="password1" id="password1">
+                            {% if errors %}
+                            <p class="help-block text-danger">{{ errors.password }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
+                            <label for="password2" class="control-label">Повторите пароль</label>
+                            <input class="form-control" type="password" name="password2" id="password1">
+                        </div>
+                    </div>
+                    <div class="col-3 offset-4">
+                        <button type="submit" class="btn btn-primary">Регистрации</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
