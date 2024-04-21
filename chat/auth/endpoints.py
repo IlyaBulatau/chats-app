@@ -4,8 +4,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from auth.decorators import login_required
 from auth.forms import AuthorizationForm, RegisterForm
-from auth.user import Authorization, Registration
+from auth.user import Authorization, Registration, user_logout
 from core.database.connect import get_db
 from core.database.repositories.user import UserRepository
 from core.exceptions import CustomException
@@ -72,4 +73,12 @@ async def authorization_method(
         context = {"errors": {exc.field: exc.message}}
         return templates.TemplateResponse(request=request, name="authorization.html", context=context)
 
+    return response
+
+
+@router.post("/logout", response_class=HTMLResponse)
+@login_required
+async def logout_method(request: Request, response_url: str = "authorization_page"):
+    response = RedirectResponse(url=request.url_for(response_url))
+    user_logout(response)
     return response

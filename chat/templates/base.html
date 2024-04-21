@@ -32,6 +32,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ url_for('register_page') }}">Регистрация</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('authorization_page') }}">Авторизация</a></li>
+                            <li><form action="{{ url_for('logout_method') }}" method="post"><button class="btn btn-link">Выйти</button></form></li>
                         </ul>
                     </li>
                 </ul>
