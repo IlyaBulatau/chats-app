@@ -3,20 +3,36 @@
 {% block title %}Authorization{% endblock %}
 
 {% block content %}
-<h1>Страница авторизации</h1>
-    <form action="authorization" method="post">
-        <label for="username">Имя пользователя</label>
-        <input type="text" name="username" id="username">
-        {% if errors %}
-        {{ errors.username }}
-        {% endif %}
-        
-        <label for="password">Пароль</label>
-        <input type="password" name="password" id="password">
-        {% if errors %}
-        {{ errors.password }}
-        {% endif %}
-
-        <button>Войти</button>
-    </form>
+<section class="register mx-auto" style="width: 800px;">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3 class="text-center">Авторизация</h3>
+                <form action="authorization" method="post" class="form-horizontal">
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
+                            <label for="username" class="control-label">Имя пользователя</label>
+                            <input class="form-control" type="text" name="username" id="username">
+                            {% if errors %}
+                            <p class="help-block text-danger">{{ errors.username }}</p>
+                            {% endif %}        
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
+                            <label for="password" class="control-label">Пароль</label>
+                            <input class="form-control" type="password" name="password" id="password">
+                            {% if errors %}
+                            <p class="help-block text-danger">{{ errors.password }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-3 offset-4">
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
