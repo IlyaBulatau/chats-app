@@ -10,7 +10,7 @@ class UsernameValidatorField(BaseValidatorField):
     def is_valid_lenght(cls, username) -> None:
         if not (cls.MIN_LENGHT < len(username) <= USERNAME_LENGHT):
             raise InCorrectUsername(
-                f"Длинна имени должна быть больше в пределах {cls.MIN_LENGHT}-{USERNAME_LENGHT} символов",
+                f"Длинна имени должна быть в пределах {cls.MIN_LENGHT}-{USERNAME_LENGHT} символов",
                 field="username",
             )
 

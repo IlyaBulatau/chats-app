@@ -64,7 +64,7 @@ class TestUsernameValidatorField:
         with pytest.raises(InCorrectUsername) as exc:
             validator.is_valid_lenght(username)
         
-        assert exc.value.message == f"Длинна имени должна быть больше в пределах {validator.MIN_LENGHT}-{USERNAME_LENGHT} символов"
+        assert exc.value.message == f"Длинна имени должна быть в пределах {validator.MIN_LENGHT}-{USERNAME_LENGHT} символов"
         assert exc.value.field == "username"
     
     
@@ -74,7 +74,7 @@ class TestUsernameValidatorField:
         with pytest.raises(InCorrectUsername) as exc:
             validator.is_valid_lenght(username)
         
-        assert exc.value.message == f"Длинна имени должна быть больше в пределах {validator.MIN_LENGHT}-{USERNAME_LENGHT} символов"
+        assert exc.value.message == f"Длинна имени должна быть в пределах {validator.MIN_LENGHT}-{USERNAME_LENGHT} символов"
         assert exc.value.field == "username"
     
     @pytest.mark.parametrize("username", [123, None, False])
