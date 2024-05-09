@@ -12,7 +12,7 @@ from chat.settings import DB_SETTINGS
 from chat.core.database.connect import get_db
 from chat.core.database.tables import mapper_registry
 from tests.factories.users import UserFactory
-
+#TODO: переписать тесты на auth модуль
 
 TEST_DB_NAME = "test_chat"
 
