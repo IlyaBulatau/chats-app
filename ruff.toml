@@ -26,6 +26,7 @@ select = [
     "ERA",
     "PL",
 ]
+ignore = ["SIM117"]
 
 [format]
 quote-style = "double"
