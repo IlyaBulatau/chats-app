@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Authorization{% endblock %}
 
 {% block content %}
@@ -11,10 +12,10 @@
                 <form action="authorization" method="post" class="form-horizontal">
                     <div class="form-row">
                         <div class="col-4 offset-4 field">
-                            <label for="username" class="control-label">Имя пользователя</label>
-                            <input class="form-control" type="text" name="username" id="username">
+                            <label for="email" class="control-label">Email</label>
+                            <input class="form-control" type="text" name="email" id="email">
                             {% if errors %}
-                            <p class="help-block text-danger">{{ errors.username }}</p>
+                            <p class="help-block text-danger">{{ errors.email }}</p>
                             {% endif %}        
                         </div>
                     </div>
@@ -31,6 +32,11 @@
                         <button type="submit" class="btn btn-primary">Войти</button>
                     </div>
                 </form>
+                <div class="col-3 offset-4">
+                    <form action="google/oauth" method="post">
+                        <button id="google-button" type="submit" class="btn btn-danger">Sign in with Google</button>    
+                    </form>
+                </div>
             </div>
         </div>
     </div>

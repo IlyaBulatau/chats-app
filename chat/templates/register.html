@@ -22,6 +22,15 @@
                     </div>
                     <div class="form-row">
                         <div class="col-4 offset-4 field">
+                            <label for="email" class="control-label">Email</label>
+                            <input class="form-control" type="email" name="email" id="email">
+                            {% if errors %}
+                            <p class="help-block text-danger">{{ errors.email }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 offset-4 field">
                             <label for="password1" class="control-label">Пароль</label>
                             <input class="form-control" type="password" name="password1" id="password1">
                             {% if errors %}
