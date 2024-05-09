@@ -68,7 +68,7 @@ class Authorization:
         if not user:
             raise AccountNotExists(field="email")
 
-        if not verify_password(self.authorization_form.password, user.password):
+        if not user.password or not verify_password(self.authorization_form.password, user.password):
             raise InCorrectPassword("Не верный пароль", field="password")
 
         payload: Payload = Payload.for_session(user.id)
