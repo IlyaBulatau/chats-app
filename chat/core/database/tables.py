@@ -12,7 +12,8 @@ user_table = db.Table(
     mapper_registry.metadata,
     Column("id", db.Integer, primary_key=True, autoincrement=True, index=True),
     Column("username", db.String(cons.USERNAME_LENGHT), unique=True, nullable=False, index=True),
-    Column("password", db.String, nullable=False),
+    Column("email", db.String, nullable=False, unique=True, index=True),
+    Column("password", db.String, nullable=True),
     Column("created_at", db.DateTime, server_default=db.sql.func.now(), nullable=False),
     Column("updated_at", db.DateTime, onupdate=db.sql.func.now(), nullable=True),
 )
