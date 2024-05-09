@@ -19,6 +19,10 @@ class MismatchPassword(CustomException):
     pass
 
 
+class InCorrectEmail(CustomException):
+    message = "Не валидный email"
+
+
 class EmptyField(CustomException):
     message = "Поле не может быть пустым"
 
