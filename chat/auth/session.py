@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import Response
 import jwt
@@ -21,6 +21,10 @@ class Session:
         payload = jwt.decode(token, key=SESSION_SETTINGS.secret, algorithms=SESSION_SETTINGS.algorithm)
         return Payload(user_id=payload["user_id"], timestamp=str_to_dt(payload["timestamp"]))
 
+    @classmethod
+    def is_expired(cls, payload: "Payload") -> bool:
+        return payload.timestamp < datetime.now()
+
 
 @dataclass
 class Payload:
@@ -29,3 +33,8 @@ class Payload:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+    @classmethod
+    def for_session(cls, user_id: int) -> "Payload":
+        dt = datetime.now() + timedelta(minutes=SESSION_SETTINGS.ttl)
+        return cls(user_id=user_id, timestamp=dt)

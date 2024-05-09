@@ -1,6 +1,7 @@
 from functools import wraps
 from typing import Coroutine
 
+from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 
 from auth.user import is_authenticated
@@ -11,7 +12,7 @@ def login_required(controller: Coroutine):
 
     @wraps(controller)
     async def wrapper(*args, **kwargs):
-        request = kwargs.get("request")
+        request: Request = kwargs.get("request")
 
         if not await is_authenticated(request):
             return RedirectResponse(request.url_for("authorization_page"))
@@ -26,7 +27,7 @@ def not_login(controller: Coroutine):
 
     @wraps(controller)
     async def wrapper(*args, **kwargs):
-        request = kwargs.get("request")
+        request: Request = kwargs.get("request")
 
         if await is_authenticated(request):
             return RedirectResponse(request.url_for("index"))

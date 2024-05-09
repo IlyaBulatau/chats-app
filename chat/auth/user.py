@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from fastapi.requests import Request
 from fastapi.responses import Response
 from jwt.exceptions import DecodeError
@@ -12,7 +10,7 @@ from core.database.connect import get_db
 from core.database.repositories.user import UserRepository
 from core.domains import User
 from core.dto.users import UserRegistryDTO
-from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
+from core.exceptions import AccountNotExists, InCorrectPassword, InCorrectUsername, IsExistsUser
 from settings import SESSION_SETTINGS
 
 
@@ -23,18 +21,29 @@ class Registration:
         self.db_session: AsyncSession = db_session
 
     async def __call__(self, *args, **kwargs):
-        if await self.is_user_exist(self.registry_form.username):
-            raise IsExistsUser(field="username")
+        if await self.is_user_exist(self.registry_form.email):
+            raise IsExistsUser(field="email")
+
+        if await self.is_taken_username(self.registry_form.username):
+            raise InCorrectUsername(message="Имя пользователя занято", field="username")
 
         await self.save_user(self.db_session)
         await self.db_session.commit()
 
     async def save_user(self, session: AsyncSession) -> None:
         form_data = self.registry_form
-        user_dto = UserRegistryDTO(username=form_data.username, password=hash_password(form_data.password1))
+        user_dto = UserRegistryDTO(
+            username=form_data.username, email=form_data.email, password=hash_password(form_data.password1)
+        )
         await self.user_repository.add(session, user_dto)
 
-    async def is_user_exist(self, username: str) -> bool:
+    async def is_user_exist(self, email: str) -> bool:
+        user = await self.user_repository.get(self.db_session, email=email)
+        if user:
+            return True
+        return False
+
+    async def is_taken_username(self, username: str) -> bool:
         user = await self.user_repository.get(self.db_session, username=username)
         if user:
             return True
@@ -55,19 +64,15 @@ class Authorization:
         self.db_session: AsyncSession = db_session
 
     async def __call__(self, *args, **kwargs):
-        user: User = await self.user_repository.get(self.db_session, username=self.authorization_form.username)
+        user: User = await self.user_repository.get(self.db_session, email=self.authorization_form.email)
         if not user:
-            raise AccountNotExists(field="username")
+            raise AccountNotExists(field="email")
 
         if not verify_password(self.authorization_form.password, user.password):
             raise InCorrectPassword("Не верный пароль", field="password")
 
-        payload: Payload = self.generate_payload(user.id)
+        payload: Payload = Payload.for_session(user.id)
         Session().set_cookie(self.response, payload)
-
-    def generate_payload(self, user_id: int) -> Payload:
-        dt = datetime.now().replace(tzinfo=None) + timedelta(minutes=SESSION_SETTINGS.ttl)
-        return Payload(user_id=user_id, timestamp=dt)
 
 
 async def current_user(request: Request) -> User | None:
@@ -81,6 +86,9 @@ async def current_user(request: Request) -> User | None:
         # invalid session key
         payload: Payload = session.get_payload(session_key)
     except DecodeError:
+        return None
+
+    if session.is_expired(payload):
         return None
 
     async_session = await anext(get_db())
