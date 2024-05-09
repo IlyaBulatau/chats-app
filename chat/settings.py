@@ -1,6 +1,7 @@
 from pathlib import Path
+from typing import Tuple, Type
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, JsonConfigSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 
 
 BASE_DIR = Path(__file__).parent
@@ -36,3 +37,34 @@ class SessionSettings(BaseSettings):
 
 
 SESSION_SETTINGS = SessionSettings()
+
+
+class GoogleOAuthSettings(BaseSettings):
+    model_config = SettingsConfigDict(json_file=BASE_DIR.joinpath("googleCreds.json"), extra="ignore")
+
+    client_id: str
+    client_secret: str
+    auth_uri: str
+    token_uri: str
+    userinfo_uri: str
+    redirect_uri: str
+    scope: str
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,  # noqa: ARG003
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            JsonConfigSettingsSource(settings_cls),
+            env_settings,
+            file_secret_settings,
+        )
+
+
+GOOGLE_OAUTH_SETTINGS = GoogleOAuthSettings()
