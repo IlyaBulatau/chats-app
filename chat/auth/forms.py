@@ -7,7 +7,7 @@ from interfaces.form import BaseForm
 
 
 class RegisterForm(BaseForm):
-    username: str  # TODO: либо убрать либо сделать не уникальным
+    username: str
     email: str
     password1: str
     password2: str

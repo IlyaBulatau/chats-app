@@ -10,7 +10,7 @@ from core.database.connect import get_db
 from core.database.repositories.user import UserRepository
 from core.domains import User
 from core.dto.users import UserRegistryDTO
-from core.exceptions import AccountNotExists, InCorrectPassword, InCorrectUsername, IsExistsUser
+from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
 from settings import SESSION_SETTINGS
 
 
@@ -24,9 +24,6 @@ class Registration:
         if await self.is_user_exist(self.registry_form.email):
             raise IsExistsUser(field="email")
 
-        if await self.is_taken_username(self.registry_form.username):
-            raise InCorrectUsername(message="Имя пользователя занято", field="username")
-
         await self.save_user(self.db_session)
         await self.db_session.commit()
 
@@ -39,12 +36,6 @@ class Registration:
 
     async def is_user_exist(self, email: str) -> bool:
         user = await self.user_repository.get(self.db_session, email=email)
-        if user:
-            return True
-        return False
-
-    async def is_taken_username(self, username: str) -> bool:
-        user = await self.user_repository.get(self.db_session, username=username)
         if user:
             return True
         return False
