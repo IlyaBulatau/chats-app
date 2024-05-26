@@ -4,9 +4,23 @@
 {% block title %}Chats{% endblock %}
 
 {% block content %}
-<h1>Chats</h1>
-<h2>Your ID: <span id="ws-id"></span></h2>
-    <form action="" onsubmit="sendMessage(event)">
+<button class="btn btn-primary add-chat-btn">Создать чат</button>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            {% for chat in chats %}
+            <div class="card bg-primary text-white mb-3 chat-block">
+                <div class="card-body">
+                    <h2 class="chat-title">{{ chat.title }}</h2>
+                    <a href="{{ url_for('get_chat_by_id', chat_id=chat.id) }}" class="btn btn-light">Перейти</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- <form action="" onsubmit="sendMessage(event)">
         <input type="text" id="messageText" autocomplete="off"/>
         <button>Send</button>
     </form>
@@ -31,5 +45,5 @@
         input.value = ''
         event.preventDefault()
     }
-</script>
+</script> -->
 {% endblock %}
