@@ -37,3 +37,45 @@ button {
 .field {
     margin-bottom: 15px;
 }
+
+.add-chat-btn {
+    position: fixed;
+    top: 50px; /* Учитываем высоту хедера */
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* Установка z-index, чтобы кнопка была поверх всего */
+  }
+
+.chat-block {
+    background-color: #007bff;
+    color: #fff;
+    padding: 20px;
+    top: 50px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    position: relative;
+  }
+  
+  .chat-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .chat-block button {
+    background-color: #0056b3;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+  }
+  
+  .chat-block button:hover {
+    background-color: #004080;
+  }
