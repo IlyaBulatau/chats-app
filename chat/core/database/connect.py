@@ -11,3 +11,4 @@ async def get_db() -> AsyncSession:  # type: ignore
     session = async_session()
     yield session
     await session.rollback()
+    await session.close()
