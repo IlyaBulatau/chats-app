@@ -25,7 +25,4 @@ class UserRepository(BaseRepository):
         result = await session.execute(smtp)
         user: User = result.scalar()
 
-        if not user:
-            return None
-
-        return user
+        return user if user else None
