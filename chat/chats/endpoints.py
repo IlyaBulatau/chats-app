@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 from auth.decorators import login_required
 from chats.use_cases.chats import get_chats_by_id, get_chats_list
-from core.dependens import get_current_user
+from core.dependencies import get_current_user
 from core.domains import Chat, User
 from settings import BASE_DIR
 
@@ -16,7 +16,11 @@ templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 @router.get("/", response_class=HTMLResponse)
 @login_required
-async def index(request: Request, user: User = Depends(get_current_user), chats: list[Chat] = Depends(get_chats_list)):
+async def index(
+    request: Request,
+    user: User = Depends(get_current_user),
+    chats: list[Chat] = Depends(get_chats_list),
+):
     return templates.TemplateResponse(request=request, name="index.html", context={"user": user, "chats": chats})
 
 

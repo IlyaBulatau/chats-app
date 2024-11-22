@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+
+<h1>{{chat.title}}</h1>
+{% for message in chat.messages %}
+<h4>message from: {{message.user.username}}</h4>
+    <p>- {{message.text}}</p>
+    <br>
+{% endfor %}
+
+<div id="messages"></div>
+
+<form action="" onsubmit="sendMessage(event)">
+    <input type="text" id="messageText" autocomplete="off"/>
+    <button>Send</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var ws = new WebSocket("ws://localhost:8000/ws/chats");
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages')
+                var message = document.createElement('p')
+                var content = document.createTextNode(event.data)
+                message.appendChild(content)
+                messages.appendChild(message)
+            };
+            function sendMessage(event) {
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+                event.preventDefault()
+            }
+</script>
+
+{% endblock %}

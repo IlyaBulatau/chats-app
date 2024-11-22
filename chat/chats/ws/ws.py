@@ -5,10 +5,11 @@ router = APIRouter(prefix="/ws", tags=["chats"])
 clients: list[WebSocket] = []
 
 
-@router.websocket("/chats/{client_id}")
-async def ws_chats(websocket: WebSocket, client_id: int):
+@router.websocket("/chats")
+async def ws_chats(websocket: WebSocket):
     await websocket.accept()
     clients.append(websocket)
+    client_id = 1
 
     try:
         while True:

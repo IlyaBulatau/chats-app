@@ -43,7 +43,10 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
             "grant_type": "authorization_code",
             "redirect_uri": cls.settings.redirect_uri,
         }
-        async with ClientSession() as client, client.post(cls.settings.token_uri, data=payload) as response:
+        async with (
+            ClientSession() as client,
+            client.post(cls.settings.token_uri, data=payload) as response,
+        ):
             if response.status == status.HTTP_200_OK:
                 data = await response.json()
                 return data.get("access_token")
