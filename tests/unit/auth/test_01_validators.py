@@ -3,7 +3,7 @@ from faker import Faker
 
 from chat.auth.validators import PasswordValidatorField, UsernameValidatorField
 from core.exceptions import InCorrectPassword, MismatchPassword, InCorrectUsername # type: ignore
-from chat.core.constancies import USERNAME_LENGHT
+from core.constants import USERNAME_LENGHT
 
 
 faker = Faker()
