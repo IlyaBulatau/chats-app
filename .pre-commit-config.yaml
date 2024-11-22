@@ -14,3 +14,12 @@ repos:
         language: system
         types: [ python ]
         exclude: ^(migrations/|tests/)
+  
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy --config-file=./mypy.ini .
+        language: system
+        types: [ python ]
+        pass_filenames: false
