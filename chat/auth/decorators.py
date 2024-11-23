@@ -8,7 +8,10 @@ from auth.user import is_authenticated
 
 
 def login_required(controller: Callable):
-    """Нужно что бы контроллер принимал обьект запроса"""
+    """
+    Декоратор для ендпоинтов доступных только для авторизованного пользователя.
+    Нужно что бы контроллер принимал обьект запроса.
+    """
 
     @wraps(controller)
     async def wrapper(*args, **kwargs):
@@ -23,7 +26,10 @@ def login_required(controller: Callable):
 
 
 def not_login(controller: Callable):
-    """Только для не авторизаванных"""
+    """
+    Декоратор только для не авторизованного пользователя.
+    Нужно что бы контроллер принимал обьект запроса.
+    """
 
     @wraps(controller)
     async def wrapper(*args, **kwargs):

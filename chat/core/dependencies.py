@@ -1,5 +1,5 @@
 """
-Функции только для метода Depends из FastAPI
+Функции только для метода Depends из FastAPI.
 """
 
 from typing import AsyncGenerator, Callable, TypeVar
@@ -14,11 +14,20 @@ T = TypeVar("T", bound=Callable)
 
 
 async def get_current_user(request: Request) -> User | None:
+    """Depends для получение текущего пользователя.
+
+    :return User | None: Обьект пользователя если он авторизован.
+    """
     user: User | None = request.state._state["user"]  # noqa: SLF001
     return user
 
 
 def get_repository(repository_class: T):
+    """Depends для получения иницализированного репозитория по типу репозитория.
+
+    :param repository_class: Класс репозитория
+    """
+
     async def wrapper() -> AsyncGenerator[T, None]:
         async with database.get_connection() as conn:
             yield repository_class(conn)

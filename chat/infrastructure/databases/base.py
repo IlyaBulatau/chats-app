@@ -6,12 +6,12 @@ class BaseDatabase:
 
     @abstractmethod
     async def get_connection(self):
-        """Получить коннект к базе данных"""
+        """Получить коннект к базе данных."""
 
     @abstractmethod
     async def close_connection(self):
-        """Закрытие всех соединений"""
+        """Закрытие всех соединений."""
 
     @abstractmethod
     def init(self):
-        """Инициализация"""
+        """Инициализация."""

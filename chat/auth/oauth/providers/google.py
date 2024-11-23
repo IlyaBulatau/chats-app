@@ -11,6 +11,10 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
 
     @classmethod
     def get_oauth_url(cls) -> str:
+        """Получение ссылки на авторизацию к google сервису.
+
+        :return str: URL от google для ссылки на авторизацию.
+        """
         base_url = cls.settings.auth_uri
         params = {
             "client_id": cls.settings.client_id,
@@ -24,6 +28,12 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
 
     @classmethod
     async def login(cls, code: str) -> UserOAuthData:
+        """Получение данных пользователя для логина от google.
+
+        :param str code: Код от коллбек вызова google для логина.
+
+        :return `UserOAuthData`: Данные пользователя.
+        """
         # TODO: обработать не 200 код
         token = await cls._get_token_for_login(code)
 
@@ -34,6 +44,12 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
 
     @classmethod
     async def _get_token_for_login(cls, auth_code: str) -> str:
+        """Получение JWT токена у google для запроса на логин.
+
+        :param str auth_code: Код от коллбека.
+
+        :return str: JWT токен.
+        """
         payload = {
             "client_id": cls.settings.client_id,
             "client_secret": cls.settings.client_secret,
@@ -51,4 +67,10 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
 
     @classmethod
     def prepared_data(cls, data: dict) -> UserOAuthData:
+        """Преобразовать полученные от google данные в обьект `UserOAuthData`.
+
+        :param dict data: Данные json пользователя
+
+        :return `UserOAuthData`: Данные пользователя в обьекте `UserOAuthData`.
+        """
         return UserOAuthData(username=data.get("name"), email=data.get("email"))  # type: ignore

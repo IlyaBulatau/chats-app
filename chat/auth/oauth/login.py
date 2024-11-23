@@ -6,16 +6,24 @@ from infrastructure.repositories.users import UserRepository
 
 
 class OAuthLogin:
-    """Авторизация/Аутентификация через сторонние сервисы"""
+    """Авторизация/Аутентификация через сторонние сервисы."""
 
     def __init__(
         self, user_data: UserOAuthData, response: Response, user_repository: UserRepository
     ):
+        """
+        :param `UserOAuthData` user_data: Данные пользователя.
+
+        :param `Response` response: Обьект http ответа.
+
+        :param `UserRepository` user_repository: Репозиторий пользователей.
+        """
         self.user_data: UserOAuthData = user_data
         self.response: Response = response
         self.user_repository = user_repository
 
     async def __call__(self):
+        """Запуск процесса авторизации."""
         user: UserDTO | None = await self.user_repository.get_by_email(email=self.user_data.email)
 
         if not user:

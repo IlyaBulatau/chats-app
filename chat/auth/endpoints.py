@@ -24,7 +24,7 @@ templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 @router.get("/register", response_class=HTMLResponse)
 @not_login
 async def register_page(request: Request):
-    """Получение страницы для р егистрации"""
+    """Получение страницы для регистрации"""
     return templates.TemplateResponse(request=request, name="register.html")
 
 

@@ -14,6 +14,10 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
 
     @asynccontextmanager
     async def get_connection(self) -> AsyncGenerator[Connection, None] | NoReturn:
+        """Получение соединения к базе данных из пулла.
+
+        :return `asyncpg.Connection`: Соедение с базой.
+        """
         if not self._init:
             raise Exception("База данных не проиницилизирована")
 
@@ -21,8 +25,10 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
             yield conn
 
     async def close_connection(self) -> None:
+        """Закрытие всех соединений пулла."""
         await self._pool.close()
 
     async def init(self) -> None:
+        """Инициализация пулла."""
         await self._pool
         self._init = True

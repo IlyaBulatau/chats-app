@@ -8,6 +8,8 @@ from auth.user import current_user
 
 
 class AddCurrentUserToRequestMiddleware(BaseHTTPMiddleware):
+    """Добавляет обьект авторизованного пользователя к обьекту запроса"""
+
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
