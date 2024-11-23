@@ -94,7 +94,9 @@ async def authorization_method(
 @login_required
 async def logout_method(request: Request, response_url: str = "authorization_page"):
     """Выход из системы"""
-    response = RedirectResponse(url=request.url_for(response_url))
+    response = RedirectResponse(
+        url=request.url_for(response_url), status_code=status.HTTP_303_SEE_OTHER
+    )
     user_logout(response)
 
     return response

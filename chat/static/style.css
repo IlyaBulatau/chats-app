@@ -18,6 +18,10 @@ button {
     display: block;
 } */
 
+.nav-item {
+    z-index: 10000;
+}
+
 .register {
     background-color: #f0f0f1;
     margin-top: 40px;
