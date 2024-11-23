@@ -1,4 +1,5 @@
 from asyncpg import Connection
+
 from dto.users import UserDTO
 
 
@@ -6,7 +7,7 @@ class UserRepository:
     def __init__(self, session: Connection):
         self.session: Connection = session
 
-    async def add(self, username: str, email: str, password: str) -> int:
+    async def add(self, username: str, email: str, password: str | None = None) -> int:
         query = "INSERT INTO users (username, email, password) VALUES($1, $2, $3) RETURNING id"
 
         result: int = await self.session.fetchval(query, username, email, password)

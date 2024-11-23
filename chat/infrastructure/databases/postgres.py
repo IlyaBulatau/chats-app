@@ -1,10 +1,10 @@
 from contextlib import asynccontextmanager
-from typing import AsyncContextManager, NoReturn
+from typing import AsyncGenerator, NoReturn
 
 from asyncpg import Connection, Pool, create_pool
-from infrastructure.databases.base import BaseDatabase
 
 from core.shared import Singleton
+from infrastructure.databases.base import BaseDatabase
 
 
 class PostgresDB(BaseDatabase, metaclass=Singleton):
@@ -13,7 +13,7 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
         self._pool: Pool = create_pool(dsn=self._dsn)
 
     @asynccontextmanager
-    async def get_connection(self) -> AsyncContextManager[Connection] | NoReturn:
+    async def get_connection(self) -> AsyncGenerator[Connection, None] | NoReturn:
         if not self._init:
             raise Exception("База данных не проиницилизирована")
 

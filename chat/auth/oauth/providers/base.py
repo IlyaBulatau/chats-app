@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
+from typing import Protocol
 
 from pydantic_settings import BaseSettings
 
-from auth.oauth.dto import UserOAuthData
+from dto.users import UserOAuthData
 
 
 class BaseOAuthProdiver(ABC):
-    settings: BaseSettings = None
+    settings: BaseSettings
 
     @classmethod
     @abstractmethod
@@ -15,5 +16,15 @@ class BaseOAuthProdiver(ABC):
 
     @classmethod
     @abstractmethod
-    async def login(cls) -> UserOAuthData:
+    async def login(cls, *args, **kwargs) -> UserOAuthData:
+        pass
+
+
+class Provider(Protocol):
+    @classmethod
+    def get_oauth_url(cls) -> str:
+        pass
+
+    @classmethod
+    async def login(cls, *args, **kwargs) -> UserOAuthData:
         pass

@@ -1,7 +1,7 @@
 class CustomException(Exception):  # noqa: N818
-    message = None
+    message: str | None = None
 
-    def __init__(self, message=None, *args, field=None, **kwargs):
+    def __init__(self, message: str | None = None, *args, field: str | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.message = self.message or message
         self.field = field

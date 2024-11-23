@@ -5,7 +5,7 @@ def hash_password(
     password: str,
 ) -> str:
     b_password: bytes = password.encode()
-    save_password: bytes = argon2.PasswordHasher().hash(b_password)
+    save_password: str = argon2.PasswordHasher().hash(b_password)
     return save_password
 
 

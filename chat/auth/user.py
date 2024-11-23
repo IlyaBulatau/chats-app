@@ -1,13 +1,14 @@
 from fastapi.requests import Request
 from fastapi.responses import Response
-from infrastructure.repositories.users import UserRepository
 from jwt.exceptions import DecodeError
 
 from auth.forms import AuthorizationForm, RegisterForm
 from auth.password import hash_password, verify_password
 from auth.session import Payload, Session
-from core.domains import User
 from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
+from dto.users import UserDTO
+from infrastructure.databases import database
+from infrastructure.repositories.users import UserRepository
 from settings import SESSION_SETTINGS
 
 
@@ -52,12 +53,16 @@ class Authorization:
         self.user_repository: UserRepository = user_repository
 
     async def __call__(self, *args, **kwargs) -> None:
-        user: User | None = await self.user_repository.get_by_email(email=self.authorization_form.email)
+        user: UserDTO | None = await self.user_repository.get_by_email(
+            email=self.authorization_form.email
+        )
 
         if not user:
             raise AccountNotExists(field="email")
 
-        if not user.password or not verify_password(self.authorization_form.password, user.password):
+        if not user.password or not verify_password(
+            self.authorization_form.password, user.password
+        ):
             raise InCorrectPassword("Не верный пароль", field="password")
 
         payload: Payload = Payload.for_session(user.id)
@@ -65,7 +70,7 @@ class Authorization:
         Session().set_cookie(self.response, payload)
 
 
-async def current_user(request: Request) -> User | None:
+async def current_user(request: Request) -> UserDTO | None:
     session_key = request.cookies.get(SESSION_SETTINGS.auth_key)
     session = Session()
 
@@ -81,11 +86,9 @@ async def current_user(request: Request) -> User | None:
     if session.is_expired(payload):
         return None
 
-    from infrastructure.databases import database
-
     async with database.get_connection() as conn:
         user_repository = UserRepository(conn)
-        user: User | None = await user_repository.get_by_id(id_=payload.user_id)
+        user: UserDTO | None = await user_repository.get_by_id(id_=payload.user_id)
 
     if not user:
         return None

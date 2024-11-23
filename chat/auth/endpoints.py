@@ -2,18 +2,18 @@ from fastapi import APIRouter, Depends, Form, status
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from infrastructure.repositories.users import UserRepository
 
 from auth.decorators import login_required, not_login
 from auth.forms import AuthorizationForm, RegisterForm
 from auth.oauth.constants import Providers
 from auth.oauth.dispatch import get_oauth_provider
-from auth.oauth.dto import UserOAuthData
 from auth.oauth.login import OAuthLogin
-from auth.oauth.providers import BaseOAuthProdiver
+from auth.oauth.providers.base import Provider
 from auth.user import Authorization, Registration, user_logout
 from core.dependencies import get_repository
 from core.exceptions import CustomException
+from dto.users import UserOAuthData
+from infrastructure.repositories.users import UserRepository
 from settings import BASE_DIR
 
 
@@ -51,7 +51,9 @@ async def register_method(
     redirect_url = request.url_for(redirect_url_for)
 
     try:
-        form = RegisterForm(username=username, email=email, password1=password1, password2=password2)
+        form = RegisterForm(
+            username=username, email=email, password1=password1, password2=password2
+        )
         registration_user = Registration(form, user_repository)
         await registration_user()
     except CustomException as exc:
@@ -81,7 +83,9 @@ async def authorization_method(
         await authorization_user()
     except CustomException as exc:
         context = {"errors": {exc.field: exc.message}}
-        return templates.TemplateResponse(request=request, name="authorization.html", context=context)
+        return templates.TemplateResponse(
+            request=request, name="authorization.html", context=context
+        )
 
     return response
 
@@ -100,7 +104,7 @@ async def logout_method(request: Request, response_url: str = "authorization_pag
 @not_login
 async def google_oauth(
     request: Request,  # noqa: ARG001
-    oauth_provider: BaseOAuthProdiver = Depends(get_oauth_provider(Providers.GOOGLE.value)),
+    oauth_provider: Provider = Depends(lambda: get_oauth_provider(Providers.GOOGLE.value)),
 ):
     """Получение url для логина через google"""
     url: str = oauth_provider.get_oauth_url()
@@ -111,13 +115,14 @@ async def google_oauth(
 async def google_oauth_callback(
     request: Request,
     code: str,
-    oauth_provider: BaseOAuthProdiver = Depends(get_oauth_provider(Providers.GOOGLE.value)),
+    oauth_provider: Provider = Depends(lambda: get_oauth_provider(Providers.GOOGLE.value)),
+    user_repository: UserRepository = Depends(get_repository(UserRepository)),
 ):
     """Вход в систему через google"""
     response = RedirectResponse(url=request.url_for("index"))
     data: UserOAuthData = await oauth_provider.login(code)
 
-    oauth_login = OAuthLogin(data, response)
+    oauth_login = OAuthLogin(data, response, user_repository)
     await oauth_login()
 
     return response

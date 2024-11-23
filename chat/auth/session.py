@@ -15,10 +15,14 @@ class Session:
     def _generate_session_token(self, payload: "Payload") -> str:
         payload_dict = payload.to_dict()
         payload_dict["timestamp"] = dt_to_str(payload_dict["timestamp"])
-        return jwt.encode(payload=payload_dict, key=SESSION_SETTINGS.secret, algorithm=SESSION_SETTINGS.algorithm)
+        return jwt.encode(
+            payload=payload_dict, key=SESSION_SETTINGS.secret, algorithm=SESSION_SETTINGS.algorithm
+        )
 
     def get_payload(self, token: str) -> "Payload":
-        payload = jwt.decode(token, key=SESSION_SETTINGS.secret, algorithms=SESSION_SETTINGS.algorithm)
+        payload = jwt.decode(
+            token, key=SESSION_SETTINGS.secret, algorithms=[SESSION_SETTINGS.algorithm]
+        )
         return Payload(user_id=payload["user_id"], timestamp=str_to_dt(payload["timestamp"]))
 
     @classmethod

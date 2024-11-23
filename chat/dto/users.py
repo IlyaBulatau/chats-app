@@ -6,4 +6,10 @@ class UserDTO:
     id: int
     username: str
     email: str
-    password: str
+    password: str | None
+
+
+@dataclass(frozen=True)
+class UserOAuthData:
+    username: str
+    email: str

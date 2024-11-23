@@ -1,5 +1,4 @@
 from infrastructure.databases.postgres import PostgresDB
-
 from settings import DB_SETTINGS
 
 

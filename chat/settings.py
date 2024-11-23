@@ -13,7 +13,9 @@ BASE_DIR = Path(__file__).parent
 
 
 class DatabaseSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="DB_", env_file=BASE_DIR.joinpath(".env"), extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="DB_", env_file=BASE_DIR.joinpath(".env"), extra="ignore"
+    )
 
     host: str
     port: int = 5432
@@ -44,7 +46,9 @@ SESSION_SETTINGS = SessionSettings()
 
 
 class GoogleOAuthSettings(BaseSettings):
-    model_config = SettingsConfigDict(json_file=BASE_DIR.joinpath("googleCreds.json"), extra="ignore")
+    model_config = SettingsConfigDict(
+        json_file=BASE_DIR.joinpath("googleCreds.json"), extra="ignore"
+    )
 
     client_id: str
     client_secret: str

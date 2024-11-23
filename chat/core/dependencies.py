@@ -1,12 +1,16 @@
-from typing import AsyncGenerator, TypeVar
+"""
+Функции только для метода Depends из FastAPI
+"""
+
+from typing import AsyncGenerator, Callable, TypeVar
 
 from fastapi.requests import Request
-from infrastructure.databases import database
 
 from core.domains import User
+from infrastructure.databases import database
 
 
-T = TypeVar("T")
+T = TypeVar("T", bound=Callable)
 
 
 async def get_current_user(request: Request) -> User | None:
