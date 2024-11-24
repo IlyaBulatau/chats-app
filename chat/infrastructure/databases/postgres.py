@@ -26,6 +26,9 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
 
     async def close_connection(self) -> None:
         """Закрытие всех соединений пулла."""
+        if not self._init:
+            raise Exception("База данных не проиницилизирована")
+
         await self._pool.close()
 
     async def init(self) -> None:

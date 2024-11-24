@@ -1,6 +1,6 @@
 from core.constants import USERNAME_LENGHT
 from core.exceptions import InCorrectPassword, InCorrectUsername, MismatchPassword
-from interfaces.validator import BaseValidatorField
+from core.validator import BaseValidatorField
 
 
 class UsernameValidatorField(BaseValidatorField):

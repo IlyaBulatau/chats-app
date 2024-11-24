@@ -3,7 +3,7 @@ from pydantic import field_validator, model_validator
 
 from auth.validators import PasswordValidatorField, UsernameValidatorField
 from core.exceptions import EmptyField, InCorrectEmail
-from interfaces.form import BaseForm
+from core.form import BaseForm
 
 
 class RegisterForm(BaseForm):
