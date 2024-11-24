@@ -3,7 +3,7 @@ from typing import Protocol
 
 from pydantic_settings import BaseSettings
 
-from dto.users import UserOAuthData
+from dto.users import UserOAuthCreateDTO
 
 
 class BaseOAuthProdiver(ABC):
@@ -16,7 +16,7 @@ class BaseOAuthProdiver(ABC):
 
     @classmethod
     @abstractmethod
-    async def login(cls, *args, **kwargs) -> UserOAuthData:
+    async def login(cls, *args, **kwargs) -> UserOAuthCreateDTO:
         pass
 
 
@@ -26,5 +26,5 @@ class Provider(Protocol):
         pass
 
     @classmethod
-    async def login(cls, *args, **kwargs) -> UserOAuthData:
+    async def login(cls, *args, **kwargs) -> UserOAuthCreateDTO:
         pass

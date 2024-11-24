@@ -2,7 +2,7 @@ from aiohttp import ClientSession
 from requests import PreparedRequest
 
 from auth.oauth.providers.base import BaseOAuthProdiver
-from dto.users import UserOAuthData
+from dto.users import UserOAuthCreateDTO
 from settings import GOOGLE_OAUTH_SETTINGS
 
 
@@ -27,12 +27,12 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
         return request.url
 
     @classmethod
-    async def login(cls, code: str) -> UserOAuthData:
+    async def login(cls, code: str) -> UserOAuthCreateDTO:
         """Получение данных пользователя для логина от google.
 
         :param str code: Код от коллбек вызова google для логина.
 
-        :return `UserOAuthData`: Данные пользователя.
+        :return `UserOAuthCreateDTO`: Данные пользователя.
         """
         # TODO: обработать не 200 код
         token = await cls._get_token_for_login(code)
@@ -66,11 +66,11 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
             return data.get("access_token")
 
     @classmethod
-    def prepared_data(cls, data: dict) -> UserOAuthData:
-        """Преобразовать полученные от google данные в обьект `UserOAuthData`.
+    def prepared_data(cls, data: dict) -> UserOAuthCreateDTO:
+        """Преобразовать полученные от google данные в обьект `UserOAuthCreateDTO`.
 
         :param dict data: Данные json пользователя
 
-        :return `UserOAuthData`: Данные пользователя в обьекте `UserOAuthData`.
+        :return `UserOAuthCreateDTO`: Данные пользователя в обьекте `UserOAuthCreateDTO`.
         """
-        return UserOAuthData(username=data.get("name"), email=data.get("email"))  # type: ignore
+        return UserOAuthCreateDTO(username=data.get("name"), email=data.get("email"))  # type: ignore

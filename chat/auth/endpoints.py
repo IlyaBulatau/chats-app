@@ -12,7 +12,7 @@ from auth.oauth.providers.base import Provider
 from auth.user import Authorization, Registration, user_logout
 from core.dependencies import get_repository
 from core.exceptions import CustomException
-from dto.users import UserOAuthData
+from dto.users import UserOAuthCreateDTO
 from infrastructure.repositories.users import UserRepository
 from settings import BASE_DIR
 
@@ -122,7 +122,7 @@ async def google_oauth_callback(
 ):
     """Вход в систему через google"""
     response = RedirectResponse(url=request.url_for("index"))
-    data: UserOAuthData = await oauth_provider.login(code)
+    data: UserOAuthCreateDTO = await oauth_provider.login(code)
 
     oauth_login = OAuthLogin(data, response, user_repository)
     await oauth_login()

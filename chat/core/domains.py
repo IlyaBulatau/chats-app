@@ -6,8 +6,6 @@ class User:
     id: int
     username: str
     email: str
-    chats: list["Chat"]
-    messages: list["Message"]
     password: str | None = None
 
 

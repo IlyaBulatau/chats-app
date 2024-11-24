@@ -5,8 +5,8 @@ from jwt.exceptions import DecodeError
 from auth.forms import AuthorizationForm, RegisterForm
 from auth.password import hash_password, verify_password
 from auth.session import Payload, Session
+from core.domains import User
 from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
-from dto.users import UserDTO
 from infrastructure.databases import database
 from infrastructure.repositories.users import UserRepository
 from settings import SESSION_SETTINGS
@@ -48,7 +48,7 @@ class Registration:
 
         :return bool: True если пользователь существует.
         """
-        user = await self.user_repository.get_by_email(email=email)
+        user = await self.user_repository.get_by("email", email)
 
         if user:
             return True
@@ -78,8 +78,8 @@ class Authorization:
 
     async def __call__(self, *args, **kwargs) -> None:
         """Запускает процесс авторизации пользователя."""
-        user: UserDTO | None = await self.user_repository.get_by_email(
-            email=self.authorization_form.email
+        user: User | None = await self.user_repository.get_by(
+            "email", self.authorization_form.email
         )
 
         if not user:
@@ -95,12 +95,12 @@ class Authorization:
         Session().set_cookie(self.response, payload)
 
 
-async def current_user(request: Request) -> UserDTO | None:
+async def current_user(request: Request) -> User | None:
     """Получить текущего пользователя из обьекта запроса.
 
     :param `Request` request: Обьект запроса.
 
-    :return `UserDTO` | None: DTO пользователя если пользователь найден в базе.
+    :return `User` | None: DTO пользователя если пользователь найден в базе.
     """
     session_key = request.cookies.get(SESSION_SETTINGS.auth_key)
     session = Session()
@@ -119,7 +119,7 @@ async def current_user(request: Request) -> UserDTO | None:
 
     async with database.get_connection() as conn:
         user_repository = UserRepository(conn)
-        user: UserDTO | None = await user_repository.get_by_id(id_=payload.user_id)
+        user: User | None = await user_repository.get_by("id", payload.user_id)
 
     if not user:
         return None
