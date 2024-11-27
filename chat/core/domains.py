@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime
+from uuid import UUID
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class User:
     id: int
     username: str
@@ -9,20 +11,11 @@ class User:
     password: str | None = None
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Chat:
     id: int
-    title: str
-    owner_id: int
-    users: list["User"]
-    messages: list["Message"]
-
-
-@dataclass
-class Message:
-    id: int
-    text: str
-    user_id: int
-    chat_id: int
-    user: User
-    chat: Chat
+    uid: UUID
+    creator_id: int
+    companion_id: int
+    created_at: datetime
+    updated_at: datetime

@@ -4,7 +4,7 @@ from core.domains import User
 
 
 class UserRepository:
-    def __init__(self, session: Connection):
+    def __init__(self, session: Connection) -> None:
         self.session: Connection = session
 
     async def add(self, username: str, email: str, password: str | None = None) -> int:
@@ -41,3 +41,14 @@ class UserRepository:
             return User(id=result[0], username=result[1], email=result[2], password=result[3])
 
         return None
+
+    async def get_all(self) -> list[User]:
+        """Получить всех пользователей.
+
+        :return list[User]: Список пользователей.
+        """
+        query = "SELECT id, username, email, password FROM users"
+
+        result = await self.session.fetch(query)
+
+        return [User(id=row[0], username=row[1], email=row[2], password=row[3]) for row in result]
