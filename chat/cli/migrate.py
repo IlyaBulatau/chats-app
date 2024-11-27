@@ -51,6 +51,11 @@ async def main() -> None:
           );
         """)
 
+        await conn.execute("""
+          ALTER TABLE chats
+          ADD UNIQUE(creator_id, companion_id);
+      """)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
