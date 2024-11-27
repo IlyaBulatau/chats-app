@@ -4,12 +4,7 @@
 
 {% block content %}
 
-<h1>{{chat.title}}</h1>
-{% for message in chat.messages %}
-<h4>message from: {{message.user.username}}</h4>
-    <p>- {{message.text}}</p>
-    <br>
-{% endfor %}
+<h1>{{chat.uid}}</h1>
 
 <div id="messages"></div>
 

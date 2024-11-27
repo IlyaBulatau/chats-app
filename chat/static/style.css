@@ -95,3 +95,9 @@ button {
     height: auto;
     padding: 5px;
 }
+
+.not-found {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+}
