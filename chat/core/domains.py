@@ -19,3 +19,13 @@ class Chat:
     companion_id: int
     created_at: datetime
     updated_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class Message:
+    id: int
+    uid: UUID
+    chat_id: int
+    sender_id: int
+    text: str
+    created_at: datetime

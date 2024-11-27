@@ -54,7 +54,18 @@ async def main() -> None:
         await conn.execute("""
           ALTER TABLE chats
           ADD UNIQUE(creator_id, companion_id);
-      """)
+        """)
+
+        await conn.execute("""
+          CREATE TABLE IF NOT EXISTS messages (
+            id SERIAL PRIMARY KEY,
+            uid UUID NOT NULL DEFAULT gen_random_uuid(),
+            chat_id INTEGER NOT NULL REFERENCES chats (id) ON DELETE CASCADE,
+            sender_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+            text TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+          )
+        """)
 
 
 if __name__ == "__main__":
