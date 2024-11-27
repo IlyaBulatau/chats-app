@@ -1,6 +1,8 @@
 import uuid
 
-from core.domains import Chat
+from core.domains import Chat, User
+from core.use_cases.checkers import is_chat_member
+from dto.chats import ChatInfoDTO
 from infrastructure.repositories.chats import ChatRepository
 
 
@@ -42,3 +44,30 @@ class ChatCreator:
         return await self.chat_repository.get_by_creator_companion_together(
             creator_id, companion_id
         )
+
+
+class ChatReader:
+    """Класс для получения информации о чате."""
+
+    def __init__(self, chat_repository: ChatRepository, member: User) -> None:
+        self.chat_repository = chat_repository
+        self.member = member
+
+    async def get_chat_info_by_id(self, chat_id: int) -> ChatInfoDTO | None:
+        """
+        Получить чат по ID. Если чат не существует или
+        текущего пользователя нету в чате, вернуть None.
+
+        :param int chat_id: ID чата.
+
+        :return `ChatInfoDTO` | None: Чат или None.
+        """
+        chat_info = await self.chat_repository.get_by_id(chat_id)
+
+        if not chat_info:
+            return None
+
+        if not is_chat_member(self.member, chat_info.chat):
+            return None
+
+        return chat_info
