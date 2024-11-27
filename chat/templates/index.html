@@ -4,19 +4,27 @@
 {% block title %}Chats{% endblock %}
 
 {% block content %}
-<button class="btn btn-primary add-chat-btn">Создать чат</button>
-
-<div class="container mt-4">
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-6 offset-md-3">
-            {% for chat in chats %}
-            <div class="card bg-primary text-white mb-3 chat-block">
-                <div class="card-body">
-                    <h2 class="chat-title">{{ chat.title }}</h2>
-                    <a href="{{ url_for('get_chat_by_id', chat_id=chat.id) }}" class="btn btn-light">Перейти</a>
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <div style="overflow-y: auto; height: 100vh">
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        {% for user in users %}
+                        {% if user.id != current_user.id %}
+                        <li class="sidebar-item">
+                            <a href="#" class="nav-link px-0 align-middle">
+                            <div><p>Пользователь: {{ user.username }}</p></div>
+                            <form action="{{ url_for('create_chat') }}" method="post" role="form">
+                            <input type="text" value="{{ user.id }}" name="companion_id" hidden>
+                            <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Чат</button>
+                            </form>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
-            {% endfor %}
         </div>
     </div>
 </div>

@@ -1,5 +1,6 @@
 html {
     font-size: 16px;
+    box-sizing: border-box;
 }
 
 body {
@@ -83,3 +84,14 @@ button {
   .chat-block button:hover {
     background-color: #004080;
   }
+
+.sidebar-item {
+    background-color: white;
+    text-align: center;
+    align-items: center;
+    border: #004080 solid 2px;
+    border-radius: 5px;
+    width: 250px;
+    height: auto;
+    padding: 5px;
+}
