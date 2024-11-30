@@ -76,3 +76,26 @@ class GoogleOAuthSettings(BaseSettings):
 
 
 GOOGLE_OAUTH_SETTINGS = GoogleOAuthSettings()
+
+
+class RedisSettings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix="REDIS_", env_file=BASE_DIR.joinpath(".env"), extra="ignore"
+    )
+
+    host: str
+    port: int = 6379
+    websocket_db: int = 1
+
+
+REDIS_SETTINGS = RedisSettings()
+
+
+class ChatSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="CHAT_", env_file=".env", extra="ignore")
+
+    keep_ttl_storage: int = 60 * 10_080  # неделя
+    key_prefix_storage: str = "chat:{chat_uid}:messages"
+
+
+CHAT_SETTINGS = ChatSettings()

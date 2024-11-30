@@ -3,7 +3,7 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from auth.decorators import login_required, not_login
+from auth.dependencies import get_current_user
 from auth.forms import AuthorizationForm, RegisterForm
 from auth.oauth.constants import Providers
 from auth.oauth.dispatch import get_oauth_provider
@@ -11,6 +11,7 @@ from auth.oauth.login import OAuthLogin
 from auth.oauth.providers.base import Provider
 from auth.user import Authorization, Registration, user_logout
 from core.dependencies import get_repository
+from core.domains import User
 from core.exceptions import CustomException
 from dto.users import UserOAuthCreateDTO
 from infrastructure.repositories.users import UserRepository
@@ -22,21 +23,18 @@ templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 
 @router.get("/register", response_class=HTMLResponse)
-@not_login
 async def register_page(request: Request):
     """Получение страницы для регистрации"""
     return templates.TemplateResponse(request=request, name="register.html")
 
 
 @router.get("/authorization", response_class=HTMLResponse)
-@not_login
 async def authorization_page(request: Request):
     """Получение страницы для логина"""
     return templates.TemplateResponse(request=request, name="authorization.html")
 
 
 @router.post("/register", response_class=HTMLResponse)
-@not_login
 async def register_method(
     request: Request,
     username: str | None = Form(None, description="Имя пользователя"),
@@ -64,7 +62,6 @@ async def register_method(
 
 
 @router.post("/authorization", response_class=HTMLResponse)
-@not_login
 async def authorization_method(
     request: Request,
     email: str | None = Form(None, description="Email"),
@@ -91,8 +88,11 @@ async def authorization_method(
 
 
 @router.post("/logout", response_class=HTMLResponse)
-@login_required
-async def logout_method(request: Request, response_url: str = "authorization_page"):
+async def logout_method(
+    request: Request,
+    response_url: str = "authorization_page",
+    user: User = Depends(get_current_user),  # noqa: ARG001
+):
     """Выход из системы"""
     response = RedirectResponse(
         url=request.url_for(response_url), status_code=status.HTTP_303_SEE_OTHER
@@ -103,7 +103,6 @@ async def logout_method(request: Request, response_url: str = "authorization_pag
 
 
 @router.post("/google/oauth")
-@not_login
 async def google_oauth(
     request: Request,  # noqa: ARG001
     oauth_provider: Provider = Depends(lambda: get_oauth_provider(Providers.GOOGLE.value)),

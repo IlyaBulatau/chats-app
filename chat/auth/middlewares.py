@@ -5,6 +5,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
 from auth.user import current_user
+from settings import SESSION_SETTINGS
 
 
 class AddCurrentUserToRequestMiddleware(BaseHTTPMiddleware):
@@ -13,6 +14,6 @@ class AddCurrentUserToRequestMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
-        user = await current_user(request)
+        user = await current_user(request.cookies.get(SESSION_SETTINGS.auth_key))
         request.state._state["user"] = user if user else None  # noqa: SLF001
         return await call_next(request)

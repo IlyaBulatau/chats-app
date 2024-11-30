@@ -1,4 +1,3 @@
-from fastapi.requests import Request
 from fastapi.responses import Response
 from jwt.exceptions import DecodeError
 
@@ -95,22 +94,22 @@ class Authorization:
         Session().set_cookie(self.response, payload)
 
 
-async def current_user(request: Request) -> User | None:
-    """Получить текущего пользователя из обьекта запроса.
+async def current_user(session_id: str | None) -> User | None:
+    """Получить текущего пользователя по ключю сессии.
 
-    :param `Request` request: Обьект запроса.
+    :param str | None session_id: ID сессии в куках.
 
-    :return `User` | None: DTO пользователя если пользователь найден в базе.
+    :return `User` | None: Обьект пользователя если пользователь найден в базе.
     """
-    session_key = request.cookies.get(SESSION_SETTINGS.auth_key)
-    session = Session()
 
-    if not session_key:
+    if not session_id:
         return None
+
+    session = Session()
 
     try:
         # invalid session key
-        payload: Payload = session.get_payload(session_key)
+        payload: Payload = session.get_payload(session_id)
     except DecodeError:
         return None
 
@@ -125,21 +124,6 @@ async def current_user(request: Request) -> User | None:
         return None
 
     return user
-
-
-async def is_authenticated(request: Request) -> bool:
-    """Проверка является ли текущий пользователь авторизованным.
-
-    :param `Request` request: Обьект запроса.
-
-    :return bool: True если пользователь является авторизованным.
-    """
-    user = await current_user(request)
-
-    if not user:
-        return False
-
-    return True
 
 
 def user_logout(response: Response):
