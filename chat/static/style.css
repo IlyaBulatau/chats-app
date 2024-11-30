@@ -101,3 +101,26 @@ button {
     place-items: center;
     height: 100vh;
 }
+
+.chat-box {
+    background-color: #f8f9fa;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+}
+
+.sender-message .message-content {
+    background-color: #e0e0e0;
+}
+
+.receiver-message .message-content {
+    background-color: #007bff;
+    color: white;
+}
+
+.nickname {
+    font-weight: bold;
+    color: #333;
+}

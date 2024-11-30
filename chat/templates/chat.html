@@ -1,35 +1,97 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Chat{% endblock %}
+{% block title %}Чат{% endblock %}
 
 {% block content %}
+<div class="container mt-4">
+    <div class="chat-header d-flex justify-content-between align-items-center">
+        <h5>
+            Чат с Пользователем 
+            {% if creator.id == request.state._state.user.id %}
+            {{ companion.username }}
+            {% else %}
+            {{ creator.username }}
+            {% endif %}
+        </h5>
+    </div>
 
-<h1>{{chat.uid}}</h1>
+    <div class="chat-box border rounded p-3" style="height: 400px; overflow-y: auto;" id="chat-box">
+    </div>
 
-<div id="messages"></div>
-
-<form action="" onsubmit="sendMessage(event)">
-    <input type="text" id="messageText" autocomplete="off"/>
-    <button>Send</button>
-</form>
+    <div class="input-group mt-3">
+        <input type="text" id="message-input" class="form-control" placeholder="Введите ваше сообщение..."
+            aria-label="Введите ваше сообщение...">
+        <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+    </div>
+</div>
 {% endblock %}
-
 {% block scripts %}
 <script>
-    var ws = new WebSocket("ws://localhost:8000/ws/chats");
-            ws.onmessage = function(event) {
-                var messages = document.getElementById('messages')
-                var message = document.createElement('p')
-                var content = document.createTextNode(event.data)
-                message.appendChild(content)
-                messages.appendChild(message)
-            };
-            function sendMessage(event) {
-                var input = document.getElementById("messageText")
-                ws.send(input.value)
-                input.value = ''
-                event.preventDefault()
-            }
-</script>
 
+    function addMessage(message) {
+        const messageElem = document.createElement("div");
+                
+        if (message.sender_id == "{{ user.id }}") {
+            messageElem.className = "message receiver-message mb-2 d-flex align-items-start justify-content-end";
+
+            const messageText = document.createElement("div");
+            messageText.className = "message-content bg-primary text-white p-2 rounded";
+            messageText.textContent = message.text;
+            messageElem.appendChild(messageText);
+            
+            const username = document.createElement("div");
+            username.className = "nickname ms-2";
+            username.textContent = "Вы";
+            messageElem.appendChild(username);
+        } else {
+            messageElem.className = "message sender-message mb-2 d-flex align-items-start";
+
+            const username = document.createElement("div");
+            username.className = "nickname me-2";
+            username.textContent = "{{ companion.username }}";
+            messageElem.appendChild(username);
+
+            const messageText = document.createElement("div");
+            messageText.className = "message-content p-2 rounded";
+            messageText.textContent = message.text;
+            messageElem.appendChild(messageText);
+        }
+
+        chatBox.appendChild(messageElem);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(protocol+"://"+window.location.host+"/chats/{{ chat.uid }}");
+    const chatBox = document.getElementById("chat-box");
+
+    socket.onopen = function () {
+        console.log("Соединение установлено.");
+        fetchMessages()
+    };
+
+    socket.onmessage = function (event) {
+        const chatBox = document.getElementById("chat-box");
+        const messageElem = document.createElement("div");
+        const messageData = JSON.parse(event.data);
+        addMessage(messageData)
+    };
+
+    function sendMessage() {
+        const input = document.getElementById('message-input');
+        const message = {"text": input.value, "chat_uid": "{{ chat.uid }}" };
+        if (message) {
+            socket.send(JSON.stringify(message)); // Отправка сообщения на сервер
+            input.value = ""; // Очистка поля ввода
+        }
+    }
+
+    function fetchMessages() {
+        fetch("/chats/{{ chat.id }}/messages").then(resp => resp.json()).then(messages => {
+            messages.forEach(message => {
+                addMessage(message)   
+            })
+        })
+    }
+
+</script>
 {% endblock %}
