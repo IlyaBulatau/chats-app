@@ -39,9 +39,12 @@ class ChatRepository:
         :return `Chat` | None: Чат или None.
         """
         query = """
-            SELECT id, uid, creator_id, companion_id, created_at, updated_at 
-            FROM chats 
-            WHERE creator_id = $1 AND companion_id = $2
+            SELECT 
+                id, uid, creator_id, companion_id, created_at, updated_at 
+            FROM 
+                chats 
+            WHERE 
+                creator_id = $1 AND companion_id = $2 OR creator_id = $2 AND companion_id = $1
         """
 
         result = await self.session.fetchrow(query, creator_id, companion_id)
@@ -106,6 +109,38 @@ class ChatRepository:
                     username=result.get("companion_username"),
                     email=result.get("companion_email"),
                 ),
+            )
+
+        return None
+
+    async def get_by_uid_and_member(self, uid: UUID, member_id: int) -> Chat | None:
+        """Получить чат по уникальному идентификатору и ID участника.
+
+        :param UUID uid: Уникальный идентификатор чата.
+
+        :param int member_id: ID участника чата.
+
+        :return `Chat` | None: Чат или None.
+        """
+        query = """
+            SELECT 
+                id, uid, creator_id, companion_id, created_at, updated_at 
+            FROM 
+                chats 
+            WHERE 
+                uid = $1 AND (creator_id = $2 OR companion_id = $2)
+        """
+
+        result = await self.session.fetchrow(query, uid, member_id)
+
+        if result:
+            return Chat(
+                id=result[0],
+                uid=result[1],
+                creator_id=result[2],
+                companion_id=result[3],
+                created_at=result[4],
+                updated_at=result[5],
             )
 
         return None

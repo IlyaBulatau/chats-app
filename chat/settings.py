@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Tuple, Type
+from uuid import UUID
 
+from fastapi import WebSocket
 from pydantic_settings import (
     BaseSettings,
     JsonConfigSettingsSource,
@@ -99,3 +101,5 @@ class ChatSettings(BaseSettings):
 
 
 CHAT_SETTINGS = ChatSettings()
+
+WS_CHAT_CONNECTIONS: dict[UUID, set[WebSocket]] = {}
