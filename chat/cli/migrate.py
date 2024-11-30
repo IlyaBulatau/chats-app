@@ -67,6 +67,13 @@ async def main() -> None:
           )
         """)
 
+        await conn.execute("""
+          CREATE
+            UNIQUE INDEX 
+          ON 
+            chats (LEAST(creator_id, companion_id), GREATEST(creator_id, companion_id));
+        """)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
