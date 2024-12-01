@@ -35,3 +35,6 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
         """Инициализация пулла."""
         await self._pool
         self._init = True
+
+    def is_init(self) -> bool:
+        return self._init

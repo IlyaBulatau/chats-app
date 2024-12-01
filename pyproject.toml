@@ -19,6 +19,8 @@ pyjwt = "^2.8.0"
 requests = "^2.31.0"
 aiohttp = "^3.9.5"
 email-validator = "^2.1.1"
+taskiq = {extras = ["reload"], version = "^0.11.9"}
+taskiq-aio-pika = "^0.4.1"
 
 
 [tool.poetry.group.test.dependencies]

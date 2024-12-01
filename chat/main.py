@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from auth.endpoints import router as auth_router
 from auth.middlewares import AddCurrentUserToRequestMiddleware
+from backgroud_tasks.broker import broker
 from chats.endpoints import router as chat_router
 from chats.ws.endpoints import router as ws_chats_router
 from core.exceptions_handlers import http_not_found_handler, http_unauthorized_handler
@@ -15,7 +16,11 @@ from settings import BASE_DIR
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa: ARG001
     await database.init()
+    await broker.startup()
+
     yield
+
+    await broker.shutdown()
 
 
 app = FastAPI(title="Chats App", lifespan=lifespan)
