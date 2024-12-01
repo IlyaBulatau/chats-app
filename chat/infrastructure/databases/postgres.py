@@ -30,6 +30,7 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
             raise Exception("База данных не проиницилизирована")
 
         await self._pool.close()
+        self._init = False
 
     async def init(self) -> None:
         """Инициализация пулла."""
