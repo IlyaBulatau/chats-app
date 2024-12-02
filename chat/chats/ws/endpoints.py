@@ -21,7 +21,7 @@ async def ws_chats(
     current_user: User = Depends(get_current_user),
     chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
 ):
-    logger.info("Client Connected")
+    logger.info(f"Client ID: {current_user.id} connected to chat ID: {chat_uid}.")
 
     manager = WebsocketChatManager(websocket, chat_uid, current_user, chat_repository)
 
@@ -33,4 +33,4 @@ async def ws_chats(
             await manager.broadcast_message()
     except WebSocketDisconnect:
         manager.disconnect()
-        logger.info("Client Disconnected")
+        logger.info(f"Client ID {current_user.id} disconnected from chat ID: {chat_uid}.")

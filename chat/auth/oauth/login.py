@@ -1,9 +1,14 @@
+import logging
+
 from fastapi.responses import Response
 
 from auth.session import Payload, Session
 from core.domains import User
 from dto.users import UserOAuthCreateDTO
 from infrastructure.repositories.users import UserRepository
+
+
+logger = logging.getLogger("uvicorn")
 
 
 class OAuthLogin:
@@ -31,6 +36,7 @@ class OAuthLogin:
             user_id = await self.user_repository.add(
                 username=self.user_data.username, email=self.user_data.email
             )
+            logger.info("OAuthLogin: user with email %s was created", self.user_data.email)
         else:
             user_id = user.id
 

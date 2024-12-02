@@ -1,9 +1,14 @@
+import logging
+
 from aiohttp import ClientSession
 from requests import PreparedRequest
 
 from auth.oauth.providers.base import BaseOAuthProdiver
 from dto.users import UserOAuthCreateDTO
 from settings import GOOGLE_OAUTH_SETTINGS
+
+
+logger = logging.getLogger("uvicorn")
 
 
 class GoogleOAuthProvider(BaseOAuthProdiver):
@@ -40,6 +45,8 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
         async with ClientSession(headers={"Authorization": f"Bearer {token}"}) as client:
             async with client.get(cls.settings.userinfo_uri) as response:
                 data = await response.json()
+                logger.info("OAuthLogin: Request for login: %s", response.status)
+
                 return cls.prepared_data(data)
 
     @classmethod
@@ -62,7 +69,9 @@ class GoogleOAuthProvider(BaseOAuthProdiver):
             client.post(cls.settings.token_uri, data=payload) as response,
         ):
             # TODO: обработать не 200 ответ
+            logger.info("OAuthLogin: Request geting jwt token for login: %s", response.status)
             data = await response.json()
+
             return data.get("access_token")
 
     @classmethod

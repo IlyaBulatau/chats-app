@@ -47,7 +47,7 @@ class WebsocketChatManager:
             data: NewMessageData = await self.websocket.receive_json()
             await self.save_message(data, self.current_user)
         except JSONDecodeError as exc:
-            logger.error("Invalid data: %s", exc)
+            logger.error("Recieve message: invalid data: %s", exc)
             await self.websocket.send_text("Invalid JSON")
             raise WebSocketException(status.WS_1003_UNSUPPORTED_DATA, "Invalid JSON")
 
@@ -68,12 +68,14 @@ class WebsocketChatManager:
         """
         try:
             data = ReceivedMessage(sender_id=sender.id, **message)
-        except ValueError:
+        except ValueError as exc:
+            logger.error("Recieve message: invalid data: %s", exc)
             raise WebSocketException(status.WS_1007_INVALID_FRAME_PAYLOAD_DATA, "Invalid JSON")
 
         chat = await self.chat_repository.get_by_uid_and_member(data.chat_uid, data.sender_id)
 
         if not chat:
+            logger.info(f"Recieve message: chat with UID: {data.chat_uid} not found")
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
 
         self._set_last_received_message(data)

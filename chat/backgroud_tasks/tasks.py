@@ -14,4 +14,6 @@ async def save_new_chat_message_in_db(chat_id: int, sender_id: int, text: str) -
     async with database.get_connection() as connection:
         message_repository = MessageRepository(connection)
         await message_repository.add(chat_id, sender_id, text)
-        logger.info(f"Message saved in DB: chat_id={chat_id}, sender_id={sender_id}, text={text}")
+        logger.info(
+            f"Task message saved in DB: chat_id={chat_id}, sender_id={sender_id}, text={text}"
+        )

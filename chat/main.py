@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
@@ -13,12 +14,17 @@ from infrastructure.databases import database
 from settings import BASE_DIR
 
 
+logger = logging.getLogger("uvicorn")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa: ARG001
     await database.init()
 
     if not broker.is_worker_process:
         await broker.startup()
+
+    logger.info("App started")
 
     yield
 
@@ -27,6 +33,8 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
 
     if database.is_init():
         await database.close_connection()
+
+    logger.info("App stopped")
 
 
 app = FastAPI(title="Chats App", lifespan=lifespan)

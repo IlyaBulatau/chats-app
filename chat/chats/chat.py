@@ -1,9 +1,13 @@
+import logging
 import uuid
 
 from core.domains import Chat, User
 from core.use_cases.checkers import is_chat_member
 from dto.chats import ChatInfoDTO
 from infrastructure.repositories.chats import ChatRepository
+
+
+logger = logging.getLogger("uvicorn")
 
 
 class ChatCreator:
@@ -29,6 +33,8 @@ class ChatCreator:
         chat_id: int = await self.chat_repository.add(
             uid=uuid.uuid4(), creator_id=creator_id, companion_id=companion_id
         )
+
+        logging.info("Chat created. ID: %s", chat_id)
 
         return chat_id
 

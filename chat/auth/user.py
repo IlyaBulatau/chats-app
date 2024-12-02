@@ -1,3 +1,5 @@
+import logging
+
 from fastapi.responses import Response
 from jwt.exceptions import DecodeError
 
@@ -9,6 +11,9 @@ from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
 from infrastructure.databases import database
 from infrastructure.repositories.users import UserRepository
 from settings import SESSION_SETTINGS
+
+
+logger = logging.getLogger("uvicorn")
 
 
 class Registration:
@@ -26,6 +31,7 @@ class Registration:
     async def __call__(self, *args, **kwargs) -> None:
         """Запуск процесса регистрации."""
         if await self.is_user_exist(self.registry_form.email):
+            logger.info("Registarion: user with email %s already exists", self.registry_form.email)
             raise IsExistsUser(field="email")
 
         await self.save_user()
@@ -82,11 +88,15 @@ class Authorization:
         )
 
         if not user:
+            logger.info(
+                "Authorization: user with email %s not found", self.authorization_form.email
+            )
             raise AccountNotExists(field="email")
 
         if not user.password or not verify_password(
             self.authorization_form.password, user.password
         ):
+            logger.info("Authorization: password not valid.")
             raise InCorrectPassword("Не верный пароль", field="password")
 
         payload: Payload = Payload.for_session(user.id)
@@ -110,7 +120,8 @@ async def current_user(session_id: str | None) -> User | None:
     try:
         # invalid session key
         payload: Payload = session.get_payload(session_id)
-    except DecodeError:
+    except DecodeError as exc:
+        logger.error("Decode JWT: invalid token: %s", exc)
         return None
 
     if session.is_expired(payload):
