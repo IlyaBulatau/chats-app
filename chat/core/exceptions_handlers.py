@@ -1,4 +1,3 @@
-from fastapi import status
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -10,9 +9,12 @@ templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 
 async def http_not_found_handler(request: Request, *args, **kwargs):
-    return templates.TemplateResponse(
-        request, name="404.html", status_code=status.HTTP_404_NOT_FOUND
-    )
+    current_user = request.state._state["user"]  # type: ignore # noqa: SLF001
+
+    if current_user:
+        return RedirectResponse(request.url_for("index"))
+
+    return RedirectResponse(request.url_for("authorization_page"))
 
 
 async def http_unauthorized_handler(request: Request, *args, **kwargs):

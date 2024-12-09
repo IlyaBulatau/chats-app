@@ -1,1 +1,1 @@
-TODO:  обработка ошибок + логгирование
+RUN taskiq - `taskiq worker backgroud_tasks.broker:broker -w 2 -fsd --reload --log-leve INFO`
