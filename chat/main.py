@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import logging
 
 from fastapi import FastAPI, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from auth.endpoints import router as auth_router
@@ -11,7 +12,7 @@ from chats.endpoints import router as chat_router
 from chats.ws.endpoints import router as ws_chats_router
 from core.exceptions_handlers import http_not_found_handler, http_unauthorized_handler
 from infrastructure.databases import database
-from settings import BASE_DIR
+from settings import APP_SETTINGS, BASE_DIR
 
 
 logger = logging.getLogger("uvicorn")
@@ -42,6 +43,13 @@ app = FastAPI(title="Chats App", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=BASE_DIR.joinpath("static")), name="static")
 
 app.add_middleware(AddCurrentUserToRequestMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_origins=APP_SETTINGS.cors_allow_origins,
+)
 
 app.include_router(chat_router)
 app.include_router(ws_chats_router)

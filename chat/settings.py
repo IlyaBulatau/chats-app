@@ -1,12 +1,9 @@
 from pathlib import Path
-from typing import Tuple, Type
 from uuid import UUID
 
 from fastapi import WebSocket
 from pydantic_settings import (
     BaseSettings,
-    JsonConfigSettingsSource,
-    PydanticBaseSettingsSource,
     SettingsConfigDict,
 )
 
@@ -48,9 +45,7 @@ SESSION_SETTINGS = SessionSettings()
 
 
 class GoogleOAuthSettings(BaseSettings):
-    model_config = SettingsConfigDict(
-        json_file=BASE_DIR.joinpath("googleCreds.json"), extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_prefix="GOOGLE_", extra="ignore", env_file=".env")
 
     client_id: str
     client_secret: str
@@ -59,22 +54,6 @@ class GoogleOAuthSettings(BaseSettings):
     userinfo_uri: str
     redirect_uri: str
     scope: str
-
-    @classmethod
-    def settings_customise_sources(
-        cls,
-        settings_cls: Type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,  # noqa: ARG003
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        return (
-            init_settings,
-            JsonConfigSettingsSource(settings_cls),
-            env_settings,
-            file_secret_settings,
-        )
 
 
 GOOGLE_OAUTH_SETTINGS = GoogleOAuthSettings()
@@ -94,5 +73,14 @@ class BrokerSettings(BaseSettings):
 
 
 BROKER_SETTINGS = BrokerSettings()
+
+
+class AppSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    cors_allow_origins: list[str] = ["*"]
+
+
+APP_SETTINGS = AppSettings()
 
 WS_CHAT_CONNECTIONS: dict[UUID, set[WebSocket]] = {}
