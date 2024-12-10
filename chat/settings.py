@@ -74,4 +74,13 @@ class BrokerSettings(BaseSettings):
 
 BROKER_SETTINGS = BrokerSettings()
 
+
+class AppSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    cors_allow_origins: list[str] = ["*"]
+
+
+APP_SETTINGS = AppSettings()
+
 WS_CHAT_CONNECTIONS: dict[UUID, set[WebSocket]] = {}
