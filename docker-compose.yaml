@@ -1,0 +1,76 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - 8000:8000
+    volumes:
+      - ./chat:/home/code
+    command: >
+      sh -c "
+        export PYTHONPATH=`pwd` && 
+        python cli/migrate.py &&
+        uvicorn main:app --reload --host 0.0.0.0 --port 8000
+      "
+    depends_on:
+      postgres:
+          condition: service_healthy
+      rabbitmq:
+          condition: service_healthy 
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - 8001:8000
+    volumes:
+      - ./chat:/home/code
+    command: >
+      sh -c "taskiq worker backgroud_tasks.broker:broker -w 2 -fsd --reload --log-leve INFO"
+    depends_on:
+      postgres:
+          condition: service_healthy
+      rabbitmq:
+          condition: service_healthy 
+  
+  postgres:
+    image: postgres:16-bullseye
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "54321:${DB_PORT}"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_LOGIN}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_LOGIN} -d ${DB_NAME}']
+      interval: 3s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+  
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5673:${BROKER_PORT}"
+      - "15673:15672"
+    volumes:
+      - rabbit_data:/data
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 2
+
+
+volumes:
+  postgres_data:
+  rabbit_data:
