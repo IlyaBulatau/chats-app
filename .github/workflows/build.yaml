@@ -42,10 +42,10 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Save Docker image tag as artifact
-        run: echo ${{ steps.meta.outputs.tags }} > ./docker_image_tag.txt
+        run: echo ${{ steps.meta.outputs.tags }} > ./docker_image.txt
 
       - name: Generate artifact attestation
         uses: actions/upload-artifact@v4
         with:
-          name: docker_image_tag
-          path: ./docker_image_tag.txt
+          name: docker_image
+          path: ./docker_image.txt
