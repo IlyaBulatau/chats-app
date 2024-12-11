@@ -40,3 +40,12 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Save Docker image tag as artifact
+        run: echo ${{ steps.meta.outputs.tags }} > ./docker_image_tag.txt
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          name: docker_image_tag
+          path: ./docker_image_tag.txt
