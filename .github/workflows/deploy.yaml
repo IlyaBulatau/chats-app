@@ -12,12 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          workflow: build.yaml
-          name: docker_image
-          path: ./docker_image.txt
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
@@ -25,7 +19,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            docker pull $(cat docker_image)
+            docker pull ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_NAME }}:main
   on-failure:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
