@@ -1,3 +1,5 @@
+name: Deploy to remote server
+
 on:
   workflow_run:
     workflows: [Build and push docker image]
@@ -5,9 +7,10 @@ on:
       - completed
 
 jobs:
-  build:
+  on-success:
     name: Build
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
@@ -16,3 +19,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: whoami
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    steps:
+      - run: echo 'The triggering workflow failed'
