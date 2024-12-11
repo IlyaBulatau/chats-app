@@ -49,3 +49,4 @@ jobs:
         with:
           name: docker_image
           path: ./docker_image.txt
+          retention-days: 1
