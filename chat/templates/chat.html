@@ -30,7 +30,7 @@
 
     function addMessage(message) {
         const messageElem = document.createElement("div");
-                
+
         if (message.sender_id == "{{ user.id }}") {
             messageElem.className = "message receiver-message mb-2 d-flex align-items-start justify-content-end";
 
@@ -48,7 +48,13 @@
 
             const username = document.createElement("div");
             username.className = "nickname me-2";
-            username.textContent = "{{ companion.username }}";
+            
+            if  (message.sender_id == "{{ companion.id }}") {
+                username.textContent = "{{ companion.username }}";
+            } else {
+                username.textContent = "{{ creator.username }}";
+            }
+            
             messageElem.appendChild(username);
 
             const messageText = document.createElement("div");
