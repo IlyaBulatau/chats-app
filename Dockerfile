@@ -62,15 +62,15 @@ COPY --from=builder $POETRY_HOME $POETRY_HOME
 
 WORKDIR /home/code
 
-RUN groupadd -r app && \
-    useradd -r -g app app && \
-    chown -R app:app /home/code
-
 COPY ./chat .
 
 COPY entrypoint.sh .
 
 RUN chmod +x ./entrypoint.sh
+
+RUN groupadd -r app && \
+    useradd -r -g app app && \
+    chown -R app:app /home/code
 
 USER app
 
