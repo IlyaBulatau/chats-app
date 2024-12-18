@@ -12,7 +12,7 @@ services:
       sh -c "
         export PYTHONPATH=`pwd` && 
         python cli/migrate.py &&
-        uvicorn main:app --reload --host 0.0.0.0 --port 8000
+        uvicorn main:app --reload --host 0.0.0.0 --port 8000 --log-config ./log_config.yaml --log-level debug
       "
     depends_on:
       postgres:
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./chat:/home/code
     command: >
-      sh -c "taskiq worker backgroud_tasks.broker:broker -w 2 -fsd --reload --log-leve INFO"
+      sh -c "taskiq worker backgroud_tasks.broker:broker -w 2 -fsd --reload --log-level INFO"
     depends_on:
       postgres:
           condition: service_healthy
