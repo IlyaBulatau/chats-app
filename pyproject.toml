@@ -36,6 +36,7 @@ coverage = "^7.5.1"
 ruff = "^0.4.1"
 pre-commit = "^3.7.0"
 mypy = "^1.13.0"
+types-aioboto3 = "^13.3.0"
 
 [build-system]
 requires = ["poetry-core"]
