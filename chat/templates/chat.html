@@ -20,7 +20,8 @@
 
     <div class="input-group mt-3">
         <input type="text" id="message-input" class="form-control" placeholder="Введите ваше сообщение..."
-            aria-label="Введите ваше сообщение...">
+            aria-label="Введите ваше сообщение..." oninput="toggleInputs()">
+        <input type="file" id="file-input" class="form-control-file" aria-label="Выберите файл..." onchange="toggleInputs()">
         <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
     </div>
 </div>
@@ -28,6 +29,41 @@
 {% block scripts %}
 <script>
 
+    function toggleInputs() {
+        const input = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+
+        // Если есть текст в поле ввода, отключаем выбор файла
+        if (input.value.trim() !== "") {
+            fileInput.disabled = true;
+        } else {
+            fileInput.disabled = false;
+        }
+
+        // Если выбраны файлы, отключаем текстовое поле
+        if (fileInput.files.length > 0) {
+            input.disabled = true;
+        } else {
+            input.disabled = false;
+        }
+    }
+
+    function updateInputStates() {
+        const input = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+
+        // Разблокируем оба поля ввода после отправки сообщения
+        input.disabled = false;
+        fileInput.disabled = false;
+
+        input.value = ""; 
+        fileInput.value = ""; 
+        
+        // Убедимся, что состояние переключается правильно
+        toggleInputs();
+    }
+
+    
     function addMessage(message) {
         const messageElem = document.createElement("div");
 
@@ -84,11 +120,36 @@
 
     function sendMessage() {
         const input = document.getElementById('message-input');
-        const message = {"text": input.value, "chat_uid": "{{ chat.uid }}" };
-        if (message) {
-            socket.send(JSON.stringify(message)); // Отправка сообщения на сервер
-            input.value = ""; // Очистка поля ввода
+        const fileInput = document.getElementById('file-input');
+
+        const message = {
+            "text": input.value, 
+            "file": null,
+            "chat_uid": "{{ chat.uid }}" 
+        };
+
+        if (fileInput.files.length === 1) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const arrayBuffer = event.target.result;
+                const byteArray = new Uint8Array(arrayBuffer);
+            
+                message.file = {
+                    "filename": file.name,
+                    "content": btoa(String.fromCharCode(...byteArray))
+                };
+            
+                socket.send(JSON.stringify(message));
+            }
+            
+            reader.readAsArrayBuffer(file);
         }
+        else if (message.text){
+            socket.send(JSON.stringify(message)); // Отправка сообщения на сервер
+        }
+
+        updateInputStates();
     }
 
     function fetchMessages() {
