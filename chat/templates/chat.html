@@ -18,16 +18,22 @@
     <div class="chat-box border rounded p-3" style="height: 400px; overflow-y: auto;" id="chat-box">
     </div>
 
+    <div id="loading-indicator" style="display: none;" class="alert alert-info mt-2">
+        Загрузка файла, пожалуйста подождите...
+    </div>
+
     <div class="input-group mt-3">
         <input type="text" id="message-input" class="form-control" placeholder="Введите ваше сообщение..."
             aria-label="Введите ваше сообщение..." oninput="toggleInputs()">
-        <input type="file" id="file-input" class="form-control-file" aria-label="Выберите файл..." onchange="toggleInputs()">
+        <input type="file" id="file-input" accept="*" class="form-control-file" 
+            aria-label="Выберите файл..." onchange="toggleInputs()">
         <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+    const loadingIndicator = document.getElementById('loading-indicator');
 
     function toggleInputs() {
         const input = document.getElementById('message-input');
@@ -40,9 +46,15 @@
             fileInput.disabled = false;
         }
 
-        // Если выбраны файлы, отключаем текстовое поле
+        // Если выбран файл, отключаем текстовое поле
         if (fileInput.files.length > 0) {
             input.disabled = true;
+            
+            if(fileInput.files[0].size > 2097152) {
+                alert("Максимальный размер файла 2 мб.");
+                fileInput.value = ""; 
+                input.disabled = false;
+            }
         } else {
             input.disabled = false;
         }
@@ -98,7 +110,9 @@
             messageText.textContent = message.text;
             messageElem.appendChild(messageText);
         }
-
+        
+        loadingIndicator.style.display = 'none';
+        
         chatBox.appendChild(messageElem);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -132,17 +146,26 @@
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function(event) {
-                const arrayBuffer = event.target.result;
-                const byteArray = new Uint8Array(arrayBuffer);
-            
-                message.file = {
-                    "filename": file.name,
-                    "content": btoa(String.fromCharCode(...byteArray))
-                };
-            
-                socket.send(JSON.stringify(message));
+                if (event.target.result) {
+                    let binary = '';
+                    const arrayBuffer = event.target.result;
+                    const byteArray = new Uint8Array(arrayBuffer);
+
+                    let len = byteArray.byteLength;
+                    for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(byteArray[i]);
+                    }
+
+                    message.file = {
+                        "filename": file.name,
+                        "content": btoa(binary)
+                    };
+                    
+                    loadingIndicator.style.display = 'block';
+                    socket.send(JSON.stringify(message));
+                }
             }
-            
+
             reader.readAsArrayBuffer(file);
         }
         else if (message.text){
