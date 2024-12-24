@@ -5,7 +5,7 @@ from uuid import UUID
 from fastapi import WebSocket, WebSocketException, status
 
 from backgroud_tasks.tasks import save_new_chat_message_in_db
-from chats.files import FileMessageCreator
+from chats.services.files import FileMessageCreator
 from chats.ws.schemas import NewMessageData
 from chats.ws.validators import ReceivedMessage
 from core.domains import Chat, User

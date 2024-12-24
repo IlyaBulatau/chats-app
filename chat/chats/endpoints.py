@@ -5,8 +5,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from auth.dependencies import get_current_user
-from chats.chat import ChatCreator, ChatReader
-from chats.messages import MessageReader
+from chats.services.chats import ChatCreator, ChatReader
+from chats.services.messages import MessageReader
 from core.dependencies import get_repository
 from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
