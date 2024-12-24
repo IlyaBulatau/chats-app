@@ -31,6 +31,8 @@ async def ws_chats(
         while True:
             await manager.receive_message()
             await manager.broadcast_message()
-    except WebSocketDisconnect:
+    except WebSocketDisconnect as exc:
         manager.disconnect()
-        logger.info(f"Client ID {current_user.id} disconnected from chat ID: {chat_uid}.")
+        logger.error(
+            f"Client ID {current_user.id} disconnected from chat ID: {chat_uid}, with error: {exc}."
+        )

@@ -7,20 +7,25 @@ class MessageRepository:
     def __init__(self, session: Connection) -> None:
         self.session: Connection = session
 
-    async def add(self, chat_id: int, sender_id: int, text: str) -> int:
+    async def add(self, chat_id: int, sender_id: int, text: str | None, file: str | None) -> int:
         """Добавить сообщение в базу.
 
         :param int chat_id: ID чата.
 
         :param int sender_id: ID отправителя.
 
-        :param str text: Текст сообщения.
+        :param str text | None: Текст сообщения.
+
+        :param str file | None: Путь к файлу.
 
         :return int: ID сообщения.
         """
-        query = "INSERT INTO messages (chat_id, sender_id, text) VALUES($1, $2, $3) RETURNING id"
+        query = """
+            INSERT INTO messages (chat_id, sender_id, text, file) 
+            VALUES($1, $2, $3, $4) RETURNING id
+        """
 
-        result: int = await self.session.fetchval(query, chat_id, sender_id, text)
+        result: int = await self.session.fetchval(query, chat_id, sender_id, text, file)
 
         return result
 

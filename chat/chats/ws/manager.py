@@ -5,10 +5,12 @@ from uuid import UUID
 from fastapi import WebSocket, WebSocketException, status
 
 from backgroud_tasks.tasks import save_new_chat_message_in_db
+from chats.files import FileMessageCreator
 from chats.ws.schemas import NewMessageData
 from chats.ws.validators import ReceivedMessage
 from core.domains import Chat, User
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.storages.s3 import FileStorage
 from settings import WS_CHAT_CONNECTIONS
 
 
@@ -58,7 +60,9 @@ class WebsocketChatManager:
                 await connection.send_text(self.last_received_message.model_dump_json())
 
     async def save_message(self, message: NewMessageData, sender: User):
-        """Валидация сообщения, запуска задачи для сохранения сообщения в базе данных.
+        """
+        Валидация сообщения, сохранение файла в s3, если он есть в сообщении,
+        запуск задачи для сохранения сообщения в базе данных.
 
         :param `NewMessageData` message: Данные сообщения.
 
@@ -78,9 +82,14 @@ class WebsocketChatManager:
             logger.info(f"Recieve message: chat with UID: {data.chat_uid} not found")
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
 
+        if data.file:
+            file_url = await FileMessageCreator(FileStorage(), data.file).create(chat.uid)
+        else:
+            file_url = None
+
         self._set_last_received_message(data)
 
-        await save_new_chat_message_in_db.kiq(chat.id, data.sender_id, data.text)
+        await save_new_chat_message_in_db.kiq(chat.id, data.sender_id, data.text, file=file_url)
 
     def _set_last_received_message(self, message: ReceivedMessage) -> None:
         """Установить последнее полученное сообщение."""

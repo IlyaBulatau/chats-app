@@ -78,6 +78,13 @@ async def main() -> None:
           chats (LEAST(creator_id, companion_id), GREATEST(creator_id, companion_id));
       """)
 
+        await conn.execute("""
+        ALTER TABLE messages ALTER COLUMN text DROP NOT NULL
+      """)
+
+        await conn.execute("""
+        ALTER TABLE messages ADD COLUMN file TEXT
+      """)
     logger.info("Migration completed")
 
 
