@@ -26,7 +26,11 @@
         <input type="text" id="message-input" class="form-control" placeholder="Введите ваше сообщение..."
             aria-label="Введите ваше сообщение..." oninput="toggleInputs()">
         <input type="file" id="file-input" accept="*" class="form-control-file" 
-            aria-label="Выберите файл..." onchange="toggleInputs()">
+            aria-label="Выберите файл..." onchange="toggleInputs()" style="display: none;">
+        <label for="file-input" class="custom-file-upload">
+            Выбрать файл
+        </label>
+        <span id="file-name" class="file-name mt-2"></span>
         <button id="send-button" class="btn btn-primary" onclick="sendMessage()" disabled>Отправить</button>
     </div>
 </div>
@@ -37,6 +41,7 @@
     const fileFileType = "file";
     const loadingIndicator = document.getElementById('loading-indicator');
     const sendButton = document.getElementById('send-button');
+    const fileNameDisplay = document.getElementById('file-name');
 
     function updateSendButtonState(text, fileCount) {
         // Активируем кнопку, если есть текст или выбран файл
@@ -57,14 +62,17 @@
         // Если выбран файл, отключаем текстовое поле
         if (fileInput.files.length > 0) {
             input.disabled = true;
+            fileNameDisplay.textContent = fileInput.files[0].name;
             
             if(fileInput.files[0].size > 2097152) {
                 alert("Максимальный размер файла 2 мб.");
                 fileInput.value = ""; 
                 input.disabled = false;
+                fileNameDisplay.textContent = "";
             }
         } else {
             input.disabled = false;
+            fileNameDisplay.textContent = "";
         }
 
         updateSendButtonState(input.value.trim(), fileInput.files.length);

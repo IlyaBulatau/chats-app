@@ -135,6 +135,44 @@ button {
     cursor: zoom-in;
 }
 
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    /* Цвет фона */
+    color: white;
+    /* Цвет текста */
+    border-radius: 5px;
+    /* Скругление углов */
+    border: none;
+    /* Убираем рамку */
+    transition: background-color 0.3s;
+    /* Плавный переход цвета */
+}
+
+.custom-file-upload:hover {
+    background-color: #0056b3;
+    /* Цвет фона при наведении */
+}
+
+.input-group {
+    margin-bottom: 15px;
+    /* Отступ между группой ввода и следующими элементами */
+}
+
+.custom-file-upload {
+    margin-right: 10px;
+    /* Отступ справа от кнопки выбора файла */
+}
+
+.file-name {
+    display: block;
+    /* Отображаем имя файла как блочный элемент */
+    margin-top: 5px;
+    /* Отступ сверху для имени файла */
+}
+
 @media (max-width: 1200px) {
     .file-image {
         max-width: 380px;
@@ -189,6 +227,28 @@ button {
     .file-image {
         max-width: 200px;
         height: auto;
+    }
+    .input-group {
+        flex-direction: column;
+        /* Переключаем элементы на вертикальное размещение */
+        align-items: stretch;
+        /* Выравниваем элементы по ширине */
+    }
+
+    .input-group input[type="text"],
+    .input-group label,
+    .input-group button {
+        width: 100%;
+        /* Устанавливаем ширину элементов на 100% */
+        margin-bottom: 10px;
+        /* Добавляем отступ между элементами */
+    }
+
+    .custom-file-upload {
+        width: 100%;
+        /* Кнопка выбора файла на всю ширину */
+        text-align: center;
+        /* Центрируем текст кнопки */
     }
 }
 @media (max-width: 550px) {
