@@ -27,5 +27,6 @@ class Message:
     uid: UUID
     chat_id: int
     sender_id: int
-    text: str
     created_at: datetime
+    text: str | None = None
+    file: str | None = None

@@ -12,6 +12,7 @@ from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
+from infrastructure.storages.s3 import FileStorage
 from settings import BASE_DIR
 
 
@@ -79,6 +80,8 @@ async def get_messages_by_chat_id(
     chat_id: int,
     current_user: User = Depends(get_current_user),  # noqa: ARG001
     message_repository: MessageRepository = Depends(get_repository(MessageRepository)),
+    file_storage: FileStorage = Depends(FileStorage),
 ):
-    message_reader = MessageReader(message_repository)
+    message_reader = MessageReader(message_repository, file_storage)
+
     return await message_reader.get_messages_from_db(chat_id)

@@ -17,3 +17,17 @@ class FileStorage:
         """
         async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
             await client.put_object(Body=file, Bucket=self._bucket, Key=path, **options)
+
+    async def get_object_url(self, path: str, expiration: int = 3600) -> str:
+        """Получить ссылку на файл в S3 хранилище.
+
+        :param `str` path: Путь к файлу.
+
+        :param `int` expiration: Время жизни ссылки в секундах.
+
+        :return `str`: Полная ссылка на файл в S3 хранилище.
+        """
+        async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
+            return await client.generate_presigned_url(
+                "get_object", Params={"Key": path, "Bucket": self._bucket}, ExpiresIn=expiration
+            )

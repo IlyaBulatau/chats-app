@@ -1,9 +1,9 @@
 import logging
 import uuid
 
-from core.domains import Chat, User
+from core.domains import User
 from core.use_cases.checkers import is_chat_member
-from dto.chats import ChatInfoDTO
+from dto.chats import ChatInfoDTO, ChatReadDTO
 from infrastructure.repositories.chats import ChatRepository
 
 
@@ -38,7 +38,7 @@ class ChatCreator:
 
         return chat_id
 
-    async def get_existing_chat(self, creator_id: int, companion_id: int) -> Chat | None:
+    async def get_existing_chat(self, creator_id: int, companion_id: int) -> ChatReadDTO | None:
         """Получить существующий чат по уникальному сочитанию создателя и собеседника.
 
         :param int creator_id: ID создателя чата.
@@ -47,8 +47,20 @@ class ChatCreator:
 
         :return `Chat` | None: Чат или None.
         """
-        return await self.chat_repository.get_by_creator_companion_together(
+        chat = await self.chat_repository.get_by_creator_companion_together(
             creator_id, companion_id
+        )
+
+        if not chat:
+            return None
+
+        return ChatReadDTO(
+            id=chat.id,
+            uid=chat.uid,
+            creator_id=chat.creator_id,
+            companion_id=chat.companion_id,
+            created_at=chat.created_at,
+            updated_at=chat.updated_at,
         )
 
 

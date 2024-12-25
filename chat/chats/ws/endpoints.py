@@ -8,6 +8,7 @@ from chats.ws.manager import WebsocketChatManager
 from core.dependencies import get_repository
 from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.storages.s3 import FileStorage
 
 
 router = APIRouter(tags=["messages"], prefix="/chats")
@@ -20,10 +21,11 @@ async def ws_chats(
     chat_uid: UUID,
     current_user: User = Depends(get_current_user),
     chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
+    file_storage: FileStorage = Depends(FileStorage),
 ):
     logger.info(f"Client ID: {current_user.id} connected to chat ID: {chat_uid}.")
 
-    manager = WebsocketChatManager(websocket, chat_uid, current_user, chat_repository)
+    manager = WebsocketChatManager(websocket, chat_uid, current_user, chat_repository, file_storage)
 
     await websocket.accept()
 

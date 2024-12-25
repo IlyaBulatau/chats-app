@@ -16,6 +16,12 @@ class StorageDirectory:
     MESSAGE = "messages/chat-{chat_uid}"
 
 
+@dataclass(frozen=True, slots=True)
+class FileType:
+    IMAGE = "image"
+    FILE = "file"
+
+
 USERNAME_LENGHT = 50
 CHAT_NAME_LENGHT = 50
 MESSAGE_LENGHT = 1000

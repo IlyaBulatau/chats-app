@@ -7,8 +7,9 @@ from fastapi import WebSocket, WebSocketException, status
 from backgroud_tasks.tasks import save_new_chat_message_in_db
 from chats.services.files import FileMessageCreator
 from chats.ws.schemas import NewMessageData
-from chats.ws.validators import ReceivedMessage
+from chats.ws.validators import ReceivedMessage, SendFile, SendMessage
 from core.domains import Chat, User
+from core.use_cases.files import get_file_type
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.storages.s3 import FileStorage
 from settings import WS_CHAT_CONNECTIONS
@@ -24,6 +25,7 @@ class WebsocketChatManager:
         chat_uid: UUID,
         current_user: User,
         chat_repository: ChatRepository,
+        file_storage: FileStorage,
     ):
         """Инициализация менеджера для работы с чатами.
 
@@ -34,12 +36,15 @@ class WebsocketChatManager:
         :param `User` current_user: Текущий пользователь.
 
         :param `ChatRepository` chat_repository: Репозиторий чатов.
+
+        :param `FileStorage` file_storage: Хранилище файлов.
         """
         self.websocket = websocket
         self.chat_uid = chat_uid
         self.current_user = current_user
         self.chat_repository = chat_repository
-        self.last_received_message: ReceivedMessage | None = None
+        self.file_storage = file_storage
+        self.message_send: SendMessage | None = None
 
         self._add_connection(self.chat_uid)
 
@@ -55,9 +60,9 @@ class WebsocketChatManager:
 
     async def broadcast_message(self) -> None:
         """Отправить сообщение всем подключенным к чату клиентам."""
-        if self.last_received_message:
+        if self.message_send:
             for connection in WS_CHAT_CONNECTIONS[self.chat_uid]:
-                await connection.send_text(self.last_received_message.model_dump_json())
+                await connection.send_text(self.message_send.model_dump_json())
 
     async def save_message(self, message: NewMessageData, sender: User):
         """
@@ -83,17 +88,29 @@ class WebsocketChatManager:
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
 
         if data.file:
-            file_url = await FileMessageCreator(FileStorage(), data.file).create(chat.uid)
+            file_url = await FileMessageCreator(self.file_storage, data.file).create(chat.uid)
+            representation_file_url = await self.file_storage.get_object_url(file_url)
+
+            send_file = SendFile(
+                name=data.file.filename,
+                url=representation_file_url,
+                type=get_file_type(data.file.filename),
+            )
         else:
+            send_file = None
             file_url = None
 
-        self._set_last_received_message(data)
+        send_message = SendMessage(
+            chat_uid=data.chat_uid, sender_id=data.sender_id, text=data.text, file=send_file
+        )
+
+        self._set_message_send(send_message)
 
         await save_new_chat_message_in_db.kiq(chat.id, data.sender_id, data.text, file=file_url)
 
-    def _set_last_received_message(self, message: ReceivedMessage) -> None:
-        """Установить последнее полученное сообщение."""
-        self.last_received_message = message
+    def _set_message_send(self, message: SendMessage) -> None:
+        """Установить сообщение для последующей отправки."""
+        self.message_send = message
 
     def _set_chat(self, chat: Chat) -> None:
         """Установить чат."""

@@ -29,9 +29,9 @@ class MessageRepository:
 
         return result
 
-    async def get_many_by_chat_id(self, chat_id: int) -> list[Message | None]:
+    async def get_many_by_chat_id(self, chat_id: int) -> list[Message] | None:
         query = """
-            SELECT id, uid, chat_id, sender_id, text, created_at 
+            SELECT id, uid, chat_id, sender_id, text, created_at, file 
             FROM messages 
             WHERE chat_id = $1 ORDER BY created_at
         """
@@ -46,6 +46,7 @@ class MessageRepository:
                 sender_id=message[3],
                 text=message[4],
                 created_at=message[5],
+                file=message[6],
             )
             for message in messages
         ]

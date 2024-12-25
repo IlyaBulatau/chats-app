@@ -79,6 +79,7 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     cors_allow_origins: list[str] = ["*"]
+    debug: bool = False
 
 
 APP_SETTINGS = AppSettings()

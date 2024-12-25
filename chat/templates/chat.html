@@ -27,13 +27,21 @@
             aria-label="Введите ваше сообщение..." oninput="toggleInputs()">
         <input type="file" id="file-input" accept="*" class="form-control-file" 
             aria-label="Выберите файл..." onchange="toggleInputs()">
-        <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+        <button id="send-button" class="btn btn-primary" onclick="sendMessage()" disabled>Отправить</button>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+    const fileImageType = "image";
+    const fileFileType = "file";
     const loadingIndicator = document.getElementById('loading-indicator');
+    const sendButton = document.getElementById('send-button');
+
+    function updateSendButtonState(text, fileCount) {
+        // Активируем кнопку, если есть текст или выбран файл
+        sendButton.disabled = !(text || fileCount);
+    }
 
     function toggleInputs() {
         const input = document.getElementById('message-input');
@@ -58,6 +66,8 @@
         } else {
             input.disabled = false;
         }
+
+        updateSendButtonState(input.value.trim(), fileInput.files.length);
     }
 
     function updateInputStates() {
@@ -81,11 +91,28 @@
 
         if (message.sender_id == "{{ user.id }}") {
             messageElem.className = "message receiver-message mb-2 d-flex align-items-start justify-content-end";
-
-            const messageText = document.createElement("div");
-            messageText.className = "message-content bg-primary text-white p-2 rounded";
-            messageText.textContent = message.text;
-            messageElem.appendChild(messageText);
+            
+            if (message.text) {
+                const messageText = document.createElement("div");
+                messageText.className = "message-content bg-primary text-white p-2 rounded";
+                messageText.textContent = message.text;
+                messageElem.appendChild(messageText);
+            }
+            else if (message.file) {
+                if (message.file.type === fileImageType) {
+                    const fileImage = document.createElement("img");
+                    fileImage.src = message.file.url;
+                    fileImage.className = "file-image mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileImage);
+                }
+                else {
+                    const fileLink = document.createElement("a");
+                    fileLink.href = message.file.url;
+                    fileLink.textContent = message.file.name
+                    fileLink.className = "file-link mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileLink);
+                }
+            }
             
             const username = document.createElement("div");
             username.className = "nickname ms-2";
@@ -105,10 +132,27 @@
             
             messageElem.appendChild(username);
 
-            const messageText = document.createElement("div");
-            messageText.className = "message-content p-2 rounded";
-            messageText.textContent = message.text;
-            messageElem.appendChild(messageText);
+            if (message.text) {
+                const messageText = document.createElement("div");
+                messageText.className = "message-content p-2 rounded";
+                messageText.textContent = message.text;
+                messageElem.appendChild(messageText);   
+            }
+             else if (message.file) {
+                if (message.file.type === fileImageType) {
+                    const fileImage = document.createElement("img");
+                    fileImage.src = message.file.url;
+                    fileImage.className = "file-image mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileImage);
+                }
+                else {
+                    const fileLink = document.createElement("a");
+                    fileLink.href = message.file.url;
+                    fileLink.textContent = message.file.name
+                    fileLink.className = "file-link mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileLink);
+                }
+            }
         }
         
         loadingIndicator.style.display = 'none';
