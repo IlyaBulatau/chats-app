@@ -83,8 +83,13 @@ async def main() -> None:
       """)
 
         await conn.execute("""
-        ALTER TABLE messages ADD COLUMN file TEXT
+        ALTER TABLE messages ADD COLUMN IF NOT EXISTS file TEXT
       """)
+
+        await conn.execute("""
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS files_mb NUMERIC(3, 2) DEFAULT 0 NOT NULL
+      """)
+
     logger.info("Migration completed")
 
 

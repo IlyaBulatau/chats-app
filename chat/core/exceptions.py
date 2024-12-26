@@ -33,3 +33,7 @@ class AccountNotExists(CustomException):
 
 class IsExistsUser(CustomException):
     message = "Пользователь уже существует"
+
+
+class UserFileQuotaExceeded(CustomException):
+    message = "Превышено максимальный размер загруженных файлов для пользователя"

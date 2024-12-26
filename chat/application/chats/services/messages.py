@@ -1,6 +1,6 @@
-from core.use_cases.files import get_file_type, get_filename
-from dto.files import FileReadDTO
-from dto.messages import MessageReadDTO
+from application.dto.files import FileReadDTO
+from application.dto.messages import MessageReadDTO
+from application.files.files import get_file_type, get_filename
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.storages.s3 import FileStorage
 

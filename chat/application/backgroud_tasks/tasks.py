@@ -1,6 +1,6 @@
 import logging
 
-from backgroud_tasks.broker import broker
+from application.backgroud_tasks.broker import broker
 from infrastructure.databases import database
 from infrastructure.repositories.messages import MessageRepository
 

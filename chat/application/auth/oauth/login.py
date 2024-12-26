@@ -2,9 +2,9 @@ import logging
 
 from fastapi.responses import Response
 
-from auth.session import Payload, Session
+from application.auth.session import Payload, Session
+from application.dto.users import UserOAuthCreateDTO
 from core.domains import User
-from dto.users import UserOAuthCreateDTO
 from infrastructure.repositories.users import UserRepository
 
 

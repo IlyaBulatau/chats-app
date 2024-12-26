@@ -3,7 +3,7 @@ from typing import NoReturn
 from fastapi import Cookie, status
 from fastapi.exceptions import HTTPException
 
-from auth.user import current_user
+from application.auth.user import current_user
 from core.domains import User
 
 

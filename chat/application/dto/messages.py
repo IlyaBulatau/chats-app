@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from dto.files import FileReadDTO
+from application.dto.files import FileReadDTO
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,9 +1,9 @@
 import logging
 import uuid
 
+from application.chats.checkers import is_chat_member
+from application.dto.chats import ChatInfoDTO, ChatReadDTO
 from core.domains import User
-from core.use_cases.checkers import is_chat_member
-from dto.chats import ChatInfoDTO, ChatReadDTO
 from infrastructure.repositories.chats import ChatRepository
 
 

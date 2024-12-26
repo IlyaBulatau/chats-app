@@ -5,12 +5,12 @@ from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from auth.middlewares import AddCurrentUserToRequestMiddleware
-from backgroud_tasks.broker import broker
-from core.exceptions_handlers import http_not_found_handler, http_unauthorized_handler
+from application.auth.middlewares import AddCurrentUserToRequestMiddleware
+from application.backgroud_tasks.broker import broker
 from infrastructure.databases import database
 from presentation.html.auth import router as auth_html_router
 from presentation.html.chats import router as chats_html_router
+from presentation.html.exception_handlers import http_not_found_handler, http_unauthorized_handler
 from presentation.ws.chats import router as chats_ws_router
 from settings import APP_SETTINGS, BASE_DIR
 

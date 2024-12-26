@@ -3,19 +3,19 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from auth.dependencies import get_current_user
-from auth.forms import AuthorizationForm, RegisterForm
-from auth.oauth.constants import Providers
-from auth.oauth.dispatch import get_oauth_provider
-from auth.oauth.login import OAuthLogin
-from auth.oauth.providers.base import Provider
-from auth.user import Authorization, Registration, user_logout
-from core.dependencies import get_repository
+from application.auth.dependencies import get_current_user
+from application.auth.forms import AuthorizationForm, RegisterForm
+from application.auth.oauth.constants import Providers
+from application.auth.oauth.dispatch import get_oauth_provider
+from application.auth.oauth.login import OAuthLogin
+from application.auth.oauth.providers.base import Provider
+from application.auth.user import Authorization, Registration, user_logout
+from application.dto.users import UserOAuthCreateDTO
 from core.domains import User
 from core.exceptions import CustomException
-from dto.users import UserOAuthCreateDTO
 from infrastructure.repositories.users import UserRepository
 from settings import BASE_DIR
+from shared.dependencies import get_repository
 
 
 router = APIRouter(prefix="/auth", tags=["Auth"])

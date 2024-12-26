@@ -3,8 +3,8 @@ import logging
 from aiohttp import ClientSession
 from requests import PreparedRequest
 
-from auth.oauth.providers.base import BaseOAuthProdiver
-from dto.users import UserOAuthCreateDTO
+from application.auth.oauth.providers.base import BaseOAuthProdiver
+from application.dto.users import UserOAuthCreateDTO
 from settings import GOOGLE_OAUTH_SETTINGS
 
 

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from slugify import slugify
 
-from chats.ws.validators import ReceivedFile
+from application.chats.ws.validators import ReceivedFile
 from core.constants import StorageDirectory
 from infrastructure.storages.s3 import FileStorage
 

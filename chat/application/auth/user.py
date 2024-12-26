@@ -3,9 +3,9 @@ import logging
 from fastapi.responses import Response
 from jwt.exceptions import DecodeError
 
-from auth.forms import AuthorizationForm, RegisterForm
-from auth.password import hash_password, verify_password
-from auth.session import Payload, Session
+from application.auth.forms import AuthorizationForm, RegisterForm
+from application.auth.password import hash_password, verify_password
+from application.auth.session import Payload, Session
 from core.domains import User
 from core.exceptions import AccountNotExists, InCorrectPassword, IsExistsUser
 from infrastructure.databases import database

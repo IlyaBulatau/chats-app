@@ -1,6 +1,6 @@
-from auth.oauth.constants import Providers
-from auth.oauth.providers import GoogleOAuthProvider
-from auth.oauth.providers.base import Provider
+from application.auth.oauth.constants import Providers
+from application.auth.oauth.providers import GoogleOAuthProvider
+from application.auth.oauth.providers.base import Provider
 
 
 def get_oauth_provider(name: str) -> Provider:

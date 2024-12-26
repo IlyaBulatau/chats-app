@@ -4,12 +4,12 @@ from uuid import UUID
 
 from fastapi import WebSocket, WebSocketException, status
 
-from backgroud_tasks.tasks import save_new_chat_message_in_db
-from chats.services.files import FileMessageCreator
-from chats.ws.schemas import NewMessageData
-from chats.ws.validators import ReceivedMessage, SendFile, SendMessage
+from application.backgroud_tasks.tasks import save_new_chat_message_in_db
+from application.chats.services.files import FileMessageCreator
+from application.chats.ws.schemas import NewMessageData
+from application.chats.ws.validators import ReceivedMessage, SendFile, SendMessage
+from application.files.files import get_file_type
 from core.domains import Chat, User
-from core.use_cases.files import get_file_type
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.storages.s3 import FileStorage
 from settings import WS_CHAT_CONNECTIONS

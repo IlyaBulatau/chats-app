@@ -3,12 +3,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-from auth.dependencies import get_current_user
-from chats.ws.manager import WebsocketChatManager
-from core.dependencies import get_repository
+from application.auth.dependencies import get_current_user
+from application.chats.ws.manager import WebsocketChatManager
 from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.storages.s3 import FileStorage
+from shared.dependencies import get_repository
 
 
 router = APIRouter(tags=["messages"], prefix="/chats")

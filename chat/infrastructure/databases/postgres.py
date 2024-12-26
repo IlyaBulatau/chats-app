@@ -3,8 +3,8 @@ from typing import AsyncGenerator, NoReturn
 
 from asyncpg import Connection, Pool, create_pool
 
-from core.shared import Singleton
 from infrastructure.databases.base import BaseDatabase
+from shared.meta_ import Singleton
 
 
 class PostgresDB(BaseDatabase, metaclass=Singleton):

@@ -3,7 +3,7 @@ from typing import Protocol
 
 from pydantic_settings import BaseSettings
 
-from dto.users import UserOAuthCreateDTO
+from application.dto.users import UserOAuthCreateDTO
 
 
 class BaseOAuthProdiver(ABC):

@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from fastapi import Response
 import jwt
 
-from core.utils import dt_to_str, str_to_dt
 from settings import SESSION_SETTINGS
+from shared.datetime_work import dt_to_str, str_to_dt
 
 
 class Session:

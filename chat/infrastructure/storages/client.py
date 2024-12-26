@@ -1,7 +1,7 @@
 from aioboto3 import Session
 
-from core.shared import Singleton
 from settings import S3_SETTINGS
+from shared.meta_ import Singleton
 
 
 class S3Client(Session, metaclass=Singleton):

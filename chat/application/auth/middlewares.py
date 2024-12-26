@@ -4,7 +4,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
-from auth.user import current_user
+from application.auth.user import current_user
 from settings import SESSION_SETTINGS
 
 

@@ -1,12 +1,13 @@
 from email_validator import validate_email
-from pydantic import field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from auth.validators import PasswordValidatorField, UsernameValidatorField
+from application.auth.validators import PasswordValidatorField, UsernameValidatorField
 from core.exceptions import EmptyField, InCorrectEmail
-from core.form import BaseForm
 
 
-class RegisterForm(BaseForm):
+class RegisterForm(BaseModel):
+    model_config = ConfigDict(extra="forbid", from_attributes=True, frozen=True)
+
     username: str
     email: str
     password1: str
@@ -45,7 +46,9 @@ class RegisterForm(BaseForm):
         return data
 
 
-class AuthorizationForm(BaseForm):
+class AuthorizationForm(BaseModel):
+    model_config = ConfigDict(extra="forbid", from_attributes=True, frozen=True)
+
     email: str
     password: str
 
