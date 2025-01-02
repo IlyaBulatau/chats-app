@@ -1,3 +1,4 @@
+import json
 from json import JSONDecodeError
 import logging
 from uuid import UUID
@@ -8,9 +9,12 @@ from application.backgroud_tasks.tasks import save_new_chat_message_in_db
 from application.chats.services.files import FileMessageCreator
 from application.chats.ws.schemas import NewMessageData
 from application.chats.ws.validators import ReceivedMessage, SendFile, SendMessage
-from application.files.files import get_file_type
+from application.files.files import calculate_file_size_from_bytes_representation, get_file_type
+from application.users.files_quota import is_available_user_quota_for_file
+from core.constants import USER_FILES_QUOTA_MB
 from core.domains import Chat, User
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.repositories.users import UserRepository
 from infrastructure.storages.s3 import FileStorage
 from settings import WS_CHAT_CONNECTIONS
 
@@ -25,6 +29,7 @@ class WebsocketChatManager:
         chat_uid: UUID,
         current_user: User,
         chat_repository: ChatRepository,
+        user_repository: UserRepository,
         file_storage: FileStorage,
     ):
         """Инициализация менеджера для работы с чатами.
@@ -37,12 +42,15 @@ class WebsocketChatManager:
 
         :param `ChatRepository` chat_repository: Репозиторий чатов.
 
+        :param `UserRepository` user_repository: Репозиторий пользователей.
+
         :param `FileStorage` file_storage: Хранилище файлов.
         """
         self.websocket = websocket
         self.chat_uid = chat_uid
         self.current_user = current_user
         self.chat_repository = chat_repository
+        self.user_repository = user_repository
         self.file_storage = file_storage
         self.message_send: SendMessage | None = None
 
@@ -63,6 +71,10 @@ class WebsocketChatManager:
         if self.message_send:
             for connection in WS_CHAT_CONNECTIONS[self.chat_uid]:
                 await connection.send_text(self.message_send.model_dump_json())
+
+    async def answer_error_message(self, message: str | None) -> None:
+        """Отправить сообщение об ошибке клиенту отправившиму сообщение."""
+        await self.websocket.send_text(json.dumps({"error": message}))
 
     async def save_message(self, message: NewMessageData, sender: User):
         """
@@ -88,7 +100,28 @@ class WebsocketChatManager:
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
 
         if data.file:
+            file_size = calculate_file_size_from_bytes_representation(
+                data.file.content.encode("utf-8")
+            )
+
+            # getting fresh user data
+            user = await self.user_repository.get_by("id", sender.id)
+
+            if not user:
+                raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "User not found")
+
+            if not is_available_user_quota_for_file(user.files_mb, file_size):
+                self.message_send = None
+                await self.answer_error_message(
+                    "Превышен максимальный размер загруженных файлов"
+                    f"для пользователя({USER_FILES_QUOTA_MB}МБ)"
+                )
+                return
+
             file_url = await FileMessageCreator(self.file_storage, data.file).create(chat.uid)
+
+            await self.user_repository.increment_files_mb(sender.id, file_size)
+
             representation_file_url = await self.file_storage.get_object_url(file_url)
 
             send_file = SendFile(

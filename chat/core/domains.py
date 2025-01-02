@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import ROUND_DOWN, Decimal
 from uuid import UUID
 
 
@@ -9,6 +10,7 @@ class User:
     username: str
     email: str
     password: str | None = None
+    files_mb: Decimal = Decimal(0).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
 
 
 @dataclass(frozen=True, slots=True)

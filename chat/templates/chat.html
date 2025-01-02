@@ -96,6 +96,12 @@
     
     function addMessage(message) {
         const messageElem = document.createElement("div");
+        
+        if (message.error) {
+            alert(message.error);
+            loadingIndicator.style.display = 'none';
+            return;
+        }        
 
         if (message.sender_id == "{{ user.id }}") {
             messageElem.className = "message receiver-message mb-2 d-flex align-items-start justify-content-end";
