@@ -219,6 +219,7 @@
         const fileInput = document.getElementById('file-input');
 
         const message = {
+            "event": "new_message",
             "text": input.value, 
             "file": null,
             "chat_uid": "{{ chat.uid }}" 

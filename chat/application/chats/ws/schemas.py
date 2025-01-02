@@ -8,6 +8,7 @@ class FileData:
 
 
 class NewMessageData(TypedDict):
+    event: str
     chat_uid: UUID | None
     text: str | None
     file: FileData | None
