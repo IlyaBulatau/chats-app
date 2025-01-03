@@ -23,7 +23,7 @@ def get_filename(file_url: str) -> str:
     return file_url.rsplit("/", 1)[1]
 
 
-def calculate_file_size_from_bytes_representation(content: bytes) -> Decimal:
+def calculate_file_size_from_bytes_to_mb(size_bytes: int) -> Decimal:
     """
     Расчет размера файла в мегабайтах.
 
@@ -31,4 +31,4 @@ def calculate_file_size_from_bytes_representation(content: bytes) -> Decimal:
 
     :return `float`: Размер файла в мегабайтах.
     """
-    return Decimal(len(content) / (1024 * 1024)).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)
+    return Decimal(size_bytes / (1024 * 1024)).quantize(Decimal("0.0001"), rounding=ROUND_DOWN)

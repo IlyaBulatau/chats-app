@@ -64,6 +64,8 @@ class WebsocketChatManager:
         self.file_storage = file_storage
         self.message_send: SendMessage | None = None
 
+        self._add_connection(self.chat_uid)
+
         self.EVENT_HANDLERS: dict[str, BaseMessageHandler] = {
             WebSocketChatEvent.NEW_MESSAGE: NewMessageHandler(
                 MessageCreator(
@@ -80,8 +82,6 @@ class WebsocketChatManager:
             ),
         }
 
-        self._add_connection(self.chat_uid)
-
     async def receive_message(self) -> None:
         """Получить и обработать сообщение от клиента."""
         try:
@@ -92,22 +92,30 @@ class WebsocketChatManager:
             self._set_message_send(message)
         except KeyError as exc:
             logger.error("Recieve message: invalid data: %s", exc)
+            self.disconnect()
             raise WebSocketException(status.WS_1007_INVALID_FRAME_PAYLOAD_DATA, "Invalid JSON")
         except JSONDecodeError as exc:
             logger.error("Recieve message: invalid data: %s", exc)
+            self.disconnect()
             raise WebSocketException(status.WS_1003_UNSUPPORTED_DATA, "Invalid JSON")
         except exceptions.InvalidJsonDataError:
+            self.disconnect()
             raise WebSocketException(status.WS_1007_INVALID_FRAME_PAYLOAD_DATA, "Invalid JSON")
         except exceptions.ChatNotFoundError:
+            self.disconnect()
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
         except exceptions.MessageNotFoundError:
+            self.disconnect()
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Message not found")
         except exceptions.UserNotFoundError:
+            self.disconnect()
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "User not found")
         except exceptions.PermissionDeniedDeleteMessageError:
+            self.disconnect()
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Permission denied")
         except exceptions.FileQuotaSizeError:
             self._set_message_send(None)
+            self.disconnect()
             await self.answer_error_message(
                 "Превышен максимальный размер загруженных файлов"
                 f"для пользователя({USER_FILES_QUOTA_MB}МБ)"

@@ -31,6 +31,32 @@ class MessageRepository:
 
         return result
 
+    async def add_with_uid(
+        self, uid: UUID, chat_id: int, sender_id: int, text: str | None, file: str | None
+    ) -> int:
+        """Добавить сообщение в базу.
+
+        :param UUID uid: Уникальный идентификатор сообщения.
+
+        :param int chat_id: ID чата.
+
+        :param int sender_id: ID отправителя.
+
+        :param str text | None: Текст сообщения.
+
+        :param str file | None: Путь к файлу.
+
+        :return int: ID сообщения."""
+
+        query = """
+            INSERT INTO messages (chat_id, sender_id, text, file, uid) 
+            VALUES($1, $2, $3, $4, $5) RETURNING id
+        """
+
+        result: int = await self.session.fetchval(query, chat_id, sender_id, text, file, uid)
+
+        return result
+
     async def get_by(self, field: str, value: str | int | UUID) -> Message | None:
         """Получить сообщение по полю.
 

@@ -31,3 +31,21 @@ class FileStorage:
             return await client.generate_presigned_url(
                 "get_object", Params={"Key": path, "Bucket": self._bucket}, ExpiresIn=expiration
             )
+
+    async def delete_object(self, path: str) -> None:
+        """Удалить файл из S3 хранилища.
+
+        :param `str` path: Путь к файлу.
+        """
+        async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
+            await client.delete_object(Bucket=self._bucket, Key=path)
+
+    async def get_object_info(self, path: str) -> dict:
+        """Получить информацию о файле в S3 хранилище.
+
+        :param `str` path: Путь к файлу.
+
+        :return `dict`: Информация о файле.
+        """
+        async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
+            return await client.head_object(Bucket=self._bucket, Key=path)

@@ -47,6 +47,7 @@ class SendMessage(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     chat_uid: UUID
+    uid: UUID  # message uid
     sender_id: int
     text: str | None = None
     file: SendFile | None = None

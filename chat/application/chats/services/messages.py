@@ -1,7 +1,8 @@
+import base64
 import logging
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from application.backgroud_tasks.tasks import save_new_chat_message_in_db
+from application.backgroud_tasks.tasks import remove_message_with_file, save_new_chat_message_in_db
 from application.chats import exceptions
 from application.chats.checkers import is_message_sender
 from application.chats.schemas import FileData
@@ -10,7 +11,7 @@ from application.chats.validators import SendFile, SendMessage
 from application.dto.files import FileReadDTO
 from application.dto.messages import MessageReadDTO
 from application.files.files import (
-    calculate_file_size_from_bytes_representation,
+    calculate_file_size_from_bytes_to_mb,
     get_file_type,
     get_filename,
 )
@@ -129,7 +130,7 @@ class MessageCreator:
             file_content: str = file.get("content")  # type: ignore
             filename: str = file.get("filename")  # type: ignore
 
-            file_size = calculate_file_size_from_bytes_representation(file_content.encode("utf-8"))
+            file_size = calculate_file_size_from_bytes_to_mb(len(base64.b64decode(file_content)))
 
             # getting fresh user data
             user = await self.user_repository.get_by("id", sender_id)
@@ -158,9 +159,19 @@ class MessageCreator:
             send_file = None
             file_url = None
 
-        await save_new_chat_message_in_db.kiq(chat.id, sender_id, text, file=file_url)
+        message_uid = uuid4()
 
-        return SendMessage(chat_uid=chat_uid, sender_id=sender_id, text=text, file=send_file)
+        await save_new_chat_message_in_db.kiq(
+            chat.id,
+            message_uid,
+            sender_id,
+            text,
+            file=file_url,
+        )
+
+        return SendMessage(
+            chat_uid=chat_uid, uid=message_uid, sender_id=sender_id, text=text, file=send_file
+        )
 
 
 class MessageRemover:
@@ -173,7 +184,9 @@ class MessageRemover:
         self.message_repository = message_repository
 
     async def remove(self, message_uid: UUID, sender: User) -> None:
-        """Перед удалением проверяет сообщение на принадлежность отправителю.
+        """
+        Перед удалением проверяет сообщение на принадлежность отправителю.
+        Если сообщение содержит файл, запускает задачу по удалению файла.
 
         :param UUID message_uid: UID сообщения
 
@@ -191,5 +204,8 @@ class MessageRemover:
             raise exceptions.PermissionDeniedDeleteMessageError(
                 "Permission denied to delete message"
             )
+
+        if message.file:
+            await remove_message_with_file.kiq(message.file, sender.id)
 
         await self.message_repository.delete_by("uid", message_uid)

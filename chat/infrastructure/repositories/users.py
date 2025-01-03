@@ -66,7 +66,21 @@ class UserRepository:
 
         :param int user_id: ID пользователя.
 
-        :param Decimal files_mb: Количество файлов.
+        :param Decimal files_mb: Размер файла в мегабайтах.
         """
+
         query = "UPDATE users SET files_mb = files_mb + $1 WHERE id = $2"
+
+        await self.session.execute(query, files_mb, user_id)
+
+    async def decrement_files_mb(self, user_id: int, files_mb: Decimal) -> None:
+        """Уменьшить квоту файлов пользователя.
+
+        :param int user_id: ID пользователя.
+
+        :param Decimal files_mb: Размер файла в мегабайтах.
+        """
+
+        query = "UPDATE users SET files_mb = files_mb - $1 WHERE id = $2"
+
         await self.session.execute(query, files_mb, user_id)
