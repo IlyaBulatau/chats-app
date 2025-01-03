@@ -45,7 +45,14 @@ relative-imports-order = "closest-to-furthest"
 section-order = ["standard-library", "third-party", "app"]
 
 [lint.isort.sections]
-"app" = ["auth", "core", "settings", "chats", "infrastructure", "dto", "backgroud_tasks"]
+"app" = [
+    "application",
+    "core", 
+    "settings", 
+    "infrastructure", 
+    "presentation",
+    "shared"
+]
 
 [lint.pylint]
 max-args = 12

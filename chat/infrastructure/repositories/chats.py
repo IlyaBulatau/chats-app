@@ -2,8 +2,8 @@ from uuid import UUID
 
 from asyncpg import Connection
 
+from application.dto.chats import ChatInfoDTO
 from core.domains import Chat, User
-from dto.chats import ChatInfoDTO
 
 
 class ChatRepository:

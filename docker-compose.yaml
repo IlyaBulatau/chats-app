@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       target: development
     ports:
-      - 8000:8000
+      - ${APP_PORT}:8000
     volumes:
       - ./chat:/home/code
     command: >
@@ -30,7 +30,7 @@ services:
     volumes:
       - ./chat:/home/code
     command: >
-      sh -c "taskiq worker backgroud_tasks.broker:broker -w 2 -fsd --reload --log-level INFO"
+      sh -c "taskiq worker application.backgroud_tasks.broker:broker -w 2 -fsd --reload --log-level INFO"
     depends_on:
       postgres:
           condition: service_healthy

@@ -78,6 +78,18 @@ async def main() -> None:
           chats (LEAST(creator_id, companion_id), GREATEST(creator_id, companion_id));
       """)
 
+        await conn.execute("""
+        ALTER TABLE messages ALTER COLUMN text DROP NOT NULL
+      """)
+
+        await conn.execute("""
+        ALTER TABLE messages ADD COLUMN IF NOT EXISTS file TEXT
+      """)
+
+        await conn.execute("""
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS files_mb NUMERIC(5, 4) DEFAULT 0 NOT NULL
+      """)
+
     logger.info("Migration completed")
 
 

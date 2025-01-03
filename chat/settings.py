@@ -79,8 +79,22 @@ class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     cors_allow_origins: list[str] = ["*"]
+    debug: bool = False
 
 
 APP_SETTINGS = AppSettings()
+
+
+class S3Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="S3_", env_file=".env", extra="ignore")
+
+    url: str
+    bucket: str
+    access_key: str
+    secret_key: str
+    region: str
+
+
+S3_SETTINGS = S3Settings()
 
 WS_CHAT_CONNECTIONS: dict[UUID, set[WebSocket]] = {}

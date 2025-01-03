@@ -1,3 +1,5 @@
+from decimal import ROUND_DOWN, Decimal
+
 from asyncpg import Connection
 
 from core.domains import User
@@ -33,12 +35,18 @@ class UserRepository:
 
         :return User | None: Пользователь или None.
         """
-        query = f"SELECT id, username, email, password FROM users WHERE {field_name} = $1"
+        query = f"SELECT id, username, email, password, files_mb FROM users WHERE {field_name} = $1"
 
         result = await self.session.fetchrow(query, value)
 
         if result:
-            return User(id=result[0], username=result[1], email=result[2], password=result[3])
+            return User(
+                id=result[0],
+                username=result[1],
+                email=result[2],
+                password=result[3],
+                files_mb=Decimal(result[4]).quantize(Decimal("0.0001"), rounding=ROUND_DOWN),
+            )
 
         return None
 
@@ -52,3 +60,27 @@ class UserRepository:
         result = await self.session.fetch(query)
 
         return [User(id=row[0], username=row[1], email=row[2], password=row[3]) for row in result]
+
+    async def increment_files_mb(self, user_id: int, files_mb: Decimal) -> None:
+        """Увеличить квоту файлов пользователя.
+
+        :param int user_id: ID пользователя.
+
+        :param Decimal files_mb: Размер файла в мегабайтах.
+        """
+
+        query = "UPDATE users SET files_mb = files_mb + $1 WHERE id = $2"
+
+        await self.session.execute(query, files_mb, user_id)
+
+    async def decrement_files_mb(self, user_id: int, files_mb: Decimal) -> None:
+        """Уменьшить квоту файлов пользователя.
+
+        :param int user_id: ID пользователя.
+
+        :param Decimal files_mb: Размер файла в мегабайтах.
+        """
+
+        query = "UPDATE users SET files_mb = files_mb - $1 WHERE id = $2"
+
+        await self.session.execute(query, files_mb, user_id)

@@ -18,31 +18,156 @@
     <div class="chat-box border rounded p-3" style="height: 400px; overflow-y: auto;" id="chat-box">
     </div>
 
+    <div id="loading-indicator" style="display: none;" class="alert alert-info mt-2">
+        Загрузка файла, пожалуйста подождите...
+    </div>
+
     <div class="input-group mt-3">
         <input type="text" id="message-input" class="form-control" placeholder="Введите ваше сообщение..."
-            aria-label="Введите ваше сообщение...">
-        <button class="btn btn-primary" onclick="sendMessage()">Отправить</button>
+            aria-label="Введите ваше сообщение..." oninput="toggleInputs()">
+        <input type="file" id="file-input" accept="*" class="form-control-file" 
+            aria-label="Выберите файл..." onchange="toggleInputs()" style="display: none;">
+        <label for="file-input" class="custom-file-upload">
+            Выбрать файл
+        </label>
+        <span id="file-name" class="file-name mt-2"></span>
+        <button id="send-button" class="btn btn-primary" onclick="sendMessage()" disabled>Отправить</button>
     </div>
 </div>
 {% endblock %}
 {% block scripts %}
 <script>
+    const fileImageType = "image";
+    const fileFileType = "file";
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const sendButton = document.getElementById('send-button');
+    const fileNameDisplay = document.getElementById('file-name');
 
+    function updateSendButtonState(text, fileCount) {
+        // Активируем кнопку, если есть текст или выбран файл
+        sendButton.disabled = !(text || fileCount);
+    }
+
+    function toggleInputs() {
+        const input = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+
+        // Если есть текст в поле ввода, отключаем выбор файла
+        if (input.value.trim() !== "") {
+            fileInput.disabled = true;
+        } else {
+            fileInput.disabled = false;
+        }
+
+        // Если выбран файл, отключаем текстовое поле
+        if (fileInput.files.length > 0) {
+            input.disabled = true;
+            fileNameDisplay.textContent = fileInput.files[0].name;
+            
+            if(fileInput.files[0].size > 2097152) {
+                alert("Максимальный размер файла 2 мб.");
+                fileInput.value = ""; 
+                input.disabled = false;
+                fileNameDisplay.textContent = "";
+            }
+        } else {
+            input.disabled = false;
+            fileNameDisplay.textContent = "";
+        }
+
+        updateSendButtonState(input.value.trim(), fileInput.files.length);
+    }
+
+    function updateInputStates() {
+        const input = document.getElementById('message-input');
+        const fileInput = document.getElementById('file-input');
+
+        // Разблокируем оба поля ввода после отправки сообщения
+        input.disabled = false;
+        fileInput.disabled = false;
+
+        input.value = ""; 
+        fileInput.value = ""; 
+        
+        // Убедимся, что состояние переключается правильно
+        toggleInputs();
+    }
+
+    
     function addMessage(message) {
         const messageElem = document.createElement("div");
 
+        if (message.error) {
+            alert(message.error);
+            loadingIndicator.style.display = 'none';
+            return;
+        }        
+
         if (message.sender_id == "{{ user.id }}") {
             messageElem.className = "message receiver-message mb-2 d-flex align-items-start justify-content-end";
+            
+            if (message.text) {
+                const messageText = document.createElement("div");
+                messageText.className = "message-content bg-primary text-white p-2 rounded";
+                messageText.textContent = message.text;
+                messageElem.appendChild(messageText);
+            }
+            else if (message.file) {
+                if (message.file.type === fileImageType) {
+                    const fileImage = document.createElement("img");
+                    fileImage.src = message.file.url;
+                    fileImage.className = "file-image mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileImage);
 
-            const messageText = document.createElement("div");
-            messageText.className = "message-content bg-primary text-white p-2 rounded";
-            messageText.textContent = message.text;
-            messageElem.appendChild(messageText);
+                    fileImage.addEventListener('click', function() {
+                    if (fileImage.requestFullscreen) {
+                        fileImage.requestFullscreen();
+                    } else if (fileImage.mozRequestFullScreen) { // Firefox
+                        fileImage.mozRequestFullScreen();
+                    } else if (fileImage.webkitRequestFullscreen) { // Chrome, Safari и Opera
+                        fileImage.webkitRequestFullscreen();
+                    } else if (fileImage.msRequestFullscreen) { // IE/Edge
+                        fileImage.msRequestFullscreen();
+                    }
+                });
+                }
+                else {
+                    const fileLink = document.createElement("a");
+                    fileLink.href = message.file.url;
+                    fileLink.textContent = message.file.name
+                    fileLink.className = "file-link mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileLink);
+                }
+            }
+
+            messageElem.dataset.messageUid = message.uid;
             
             const username = document.createElement("div");
             username.className = "nickname ms-2";
             username.textContent = "Вы";
             messageElem.appendChild(username);
+
+            const deleteIcon = document.createElement("i");
+            deleteIcon.dataset.messageUid = message.uid;
+            deleteIcon.style.cursor = "pointer";
+            deleteIcon.className = "bi bi-trash ms-2 text-danger";
+            deleteIcon.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Вы уверены?',
+                    text: "Сообщение будет удалено!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Да',
+                    cancelButtonText: 'Отмена'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteMessage(deleteIcon.dataset.messageUid);
+                    }
+                });
+            });
+            messageElem.appendChild(deleteIcon);
         } else {
             messageElem.className = "message sender-message mb-2 d-flex align-items-start";
 
@@ -57,12 +182,43 @@
             
             messageElem.appendChild(username);
 
-            const messageText = document.createElement("div");
-            messageText.className = "message-content p-2 rounded";
-            messageText.textContent = message.text;
-            messageElem.appendChild(messageText);
+            if (message.text) {
+                const messageText = document.createElement("div");
+                messageText.className = "message-content p-2 rounded";
+                messageText.textContent = message.text;
+                messageElem.appendChild(messageText);   
+            }
+             else if (message.file) {
+                if (message.file.type === fileImageType) {
+                    const fileImage = document.createElement("img");
+                    fileImage.src = message.file.url;
+                    fileImage.className = "file-image mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileImage);
+                    
+                    fileImage.addEventListener('click', function() {
+                    if (fileImage.requestFullscreen) {
+                        fileImage.requestFullscreen();
+                    } else if (fileImage.mozRequestFullScreen) { // Firefox
+                        fileImage.mozRequestFullScreen();
+                    } else if (imgElement.webkitRequestFullscreen) { // Chrome, Safari и Opera
+                        fileImage.webkitRequestFullscreen();
+                    } else if (fileImage.msRequestFullscreen) { // IE/Edge
+                        fileImage.msRequestFullscreen();
+                    }
+                });
+                }
+                else {
+                    const fileLink = document.createElement("a");
+                    fileLink.href = message.file.url;
+                    fileLink.textContent = message.file.name
+                    fileLink.className = "file-link mt-1 d-block"; // Добавляем класс для стилизации
+                    messageElem.appendChild(fileLink);
+                }
+            }
         }
-
+        
+        loadingIndicator.style.display = 'none';
+        
         chatBox.appendChild(messageElem);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -82,13 +238,63 @@
         addMessage(messageData)
     };
 
+    function deleteMessage(messageUid) {
+        const messageElems = chatBox.getElementsByClassName("receiver-message");
+        for (const messageElem of messageElems) {
+            if (messageElem.dataset.messageUid === messageUid) {
+                messageElem.remove();
+                break;
+            }
+        }
+        const message = {
+            "event": "delete_message",
+            "message_uid": messageUid,
+        };
+        socket.send(JSON.stringify(message));
+    }
+
     function sendMessage() {
         const input = document.getElementById('message-input');
-        const message = {"text": input.value, "chat_uid": "{{ chat.uid }}" };
-        if (message) {
-            socket.send(JSON.stringify(message)); // Отправка сообщения на сервер
-            input.value = ""; // Очистка поля ввода
+        const fileInput = document.getElementById('file-input');
+
+        const message = {
+            "event": "new_message",
+            "text": input.value, 
+            "file": null,
+            "chat_uid": "{{ chat.uid }}" 
+        };
+
+        if (fileInput.files.length === 1) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                if (event.target.result) {
+                    let binary = '';
+                    const arrayBuffer = event.target.result;
+                    const byteArray = new Uint8Array(arrayBuffer);
+
+                    let len = byteArray.byteLength;
+                    for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(byteArray[i]);
+                    }
+
+                    message.file = {
+                        "filename": file.name,
+                        "content": btoa(binary)
+                    };
+                    
+                    loadingIndicator.style.display = 'block';
+                    socket.send(JSON.stringify(message));
+                }
+            }
+
+            reader.readAsArrayBuffer(file);
         }
+        else if (message.text){
+            socket.send(JSON.stringify(message)); // Отправка сообщения на сервер
+        }
+
+        updateInputStates();
     }
 
     function fetchMessages() {
