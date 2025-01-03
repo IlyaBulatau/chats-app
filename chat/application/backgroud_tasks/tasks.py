@@ -51,16 +51,19 @@ async def remove_message_with_file(file_path: str, owner_id: int) -> None:
 
     storage = FileStorage()
 
-    file_info = await storage.get_object_info(file_path)
+    try:
+        file_info = await storage.get_object_info(file_path)
 
-    file_size_bytes = int(file_info["ContentLength"])
-    file_size_mb = calculate_file_size_from_bytes_to_mb(file_size_bytes)
+        file_size_bytes = int(file_info["ContentLength"])
+        file_size_mb = calculate_file_size_from_bytes_to_mb(file_size_bytes)
 
-    async with database.get_connection() as connection:
-        user_repository = UserRepository(connection)
+        async with database.get_connection() as connection:
+            user_repository = UserRepository(connection)
 
-        await user_repository.decrement_files_mb(owner_id, file_size_mb)
+            await user_repository.decrement_files_mb(owner_id, file_size_mb)
 
-    await storage.delete_object(file_path)
+        await storage.delete_object(file_path)
 
-    logger.info(f"Task remove message with file: {file_path}")
+        logger.info(f"Task remove message with file: {file_path} complete")
+    except Exception as exc:
+        logger.error(f"Task remove message with file: {file_path} failed with error: {exc}")

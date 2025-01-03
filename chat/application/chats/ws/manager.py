@@ -151,6 +151,8 @@ class WebsocketChatManager:
         if self.chat_uid:
             chat = WS_CHAT_CONNECTIONS[self.chat_uid]
             chat.remove(self.websocket)
-
+            logger.info(
+                f"Client ID: {self.current_user.id} disconnected from chat ID: {self.chat_uid}."
+            )
             if not chat:
                 del WS_CHAT_CONNECTIONS[self.chat_uid]
