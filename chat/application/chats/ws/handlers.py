@@ -2,14 +2,16 @@ from abc import ABC, abstractmethod
 import logging
 
 from application.backgroud_tasks.tasks import save_new_chat_message_in_db
+from application.chats.checkers import is_message_sender
 from application.chats.services.files import FileMessageCreator
 from application.chats.ws import exceptions
 from application.chats.ws.schemas import NewMessageData
-from application.chats.ws.validators import ReceivedMessage, SendFile, SendMessage
+from application.chats.ws.validators import DeleteMessage, ReceivedMessage, SendFile, SendMessage
 from application.files.files import calculate_file_size_from_bytes_representation, get_file_type
 from application.users.files_quota import is_available_user_quota_for_file
 from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
 from infrastructure.storages.s3 import FileStorage
 
@@ -98,4 +100,35 @@ class NewMessageHandler(BaseMessageHandler):
 
 
 class DeleteMessageHandler(BaseMessageHandler):
-    async def handle(self, message: NewMessageData): ...
+    """Удаляет сообщение из чата."""
+
+    def __init__(self, sender: User, message_repository: MessageRepository):
+        self.sender = sender
+        self.message_repository = message_repository
+
+    async def handle(self, message: NewMessageData) -> None:
+        """Удаление сообщения.
+
+        :param `NewMessageData` message: Данные сообщения.
+
+        :return: None
+        """
+        try:
+            data = DeleteMessage(**message)
+        except ValueError as exc:
+            logger.error("Recieve message: invalid data: %s", exc)
+            raise exceptions.InvalidJsonDataError("Invalid json message")
+
+        message = await self.message_repository.get_by("uid", data.message_uid)
+
+        if not message:
+            logger.info(f"Recieve message: message with UID: {data.message_uid} not found")
+            raise exceptions.MessageNotFoundError("Message not found")
+
+        if not is_message_sender(self.sender, message):
+            logger.info("Permission denied to delete message by user")
+            raise exceptions.PermissionDeniedDeleteMessageError(
+                "Permission denied to delete message"
+            )
+
+        await self.message_repository.delete_by("uid", data.message_uid)

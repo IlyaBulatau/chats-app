@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from asyncpg import Connection
 
 from core.domains import Message
@@ -29,6 +31,35 @@ class MessageRepository:
 
         return result
 
+    async def get_by(self, field: str, value: str | int | UUID) -> Message | None:
+        """Получить сообщение по полю.
+
+        :param str field: Поле.
+
+        :param int | str value: Значение поля.
+
+        :return Message | None: Сообщение или None.
+        """
+        query = f"""
+            SELECT id, uid, chat_id, sender_id, text, created_at, file 
+            FROM messages WHERE {field} = $1
+        """
+
+        message = await self.session.fetchrow(query, value)
+
+        if message:
+            return Message(
+                id=message[0],
+                uid=message[1],
+                chat_id=message[2],
+                sender_id=message[3],
+                text=message[4],
+                created_at=message[5],
+                file=message[6],
+            )
+
+        return None
+
     async def get_many_by_chat_id(self, chat_id: int) -> list[Message] | None:
         query = """
             SELECT id, uid, chat_id, sender_id, text, created_at, file 
@@ -50,3 +81,14 @@ class MessageRepository:
             )
             for message in messages
         ]
+
+    async def delete_by(self, field: str, value: str | int | UUID) -> None:
+        """Удалить сообщение из базы.
+
+        :param str field: Поле.
+
+        :param int | str value: Значение поля.
+        """
+        query = f"DELETE FROM messages WHERE {field} = $1"
+
+        await self.session.execute(query, value)

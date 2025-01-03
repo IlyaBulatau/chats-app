@@ -12,3 +12,11 @@ class UserNotFoundError(Exception):
 
 class FileQuotaSizeError(Exception):
     pass
+
+
+class MessageNotFoundError(Exception):
+    pass
+
+
+class PermissionDeniedDeleteMessageError(Exception):
+    pass

@@ -17,6 +17,7 @@ from application.chats.ws.validators import SendMessage
 from core.constants import USER_FILES_QUOTA_MB
 from core.domains import Chat, User
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
 from infrastructure.storages.s3 import FileStorage
 from settings import WS_CHAT_CONNECTIONS
@@ -33,6 +34,7 @@ class WebsocketChatManager:
         current_user: User,
         chat_repository: ChatRepository,
         user_repository: UserRepository,
+        message_repository: MessageRepository,
         file_storage: FileStorage,
     ):
         """Инициализация менеджера для работы с чатами.
@@ -47,6 +49,8 @@ class WebsocketChatManager:
 
         :param `UserRepository` user_repository: Репозиторий пользователей.
 
+        :param `MessageRepository` message_repository: Репозиторий сообщений.
+
         :param `FileStorage` file_storage: Хранилище файлов.
         """
         self.websocket = websocket
@@ -54,6 +58,7 @@ class WebsocketChatManager:
         self.current_user = current_user
         self.chat_repository = chat_repository
         self.user_repository = user_repository
+        self.message_repository = message_repository
         self.file_storage = file_storage
         self.message_send: SendMessage | None = None
 
@@ -61,7 +66,9 @@ class WebsocketChatManager:
             WebSocketChatEvent.NEW_MESSAGE: NewMessageHandler(
                 self.chat_repository, self.user_repository, self.file_storage, self.current_user
             ),
-            WebSocketChatEvent.DELETE_MESSAGE: DeleteMessageHandler(),
+            WebSocketChatEvent.DELETE_MESSAGE: DeleteMessageHandler(
+                self.current_user, self.message_repository
+            ),
         }
 
         self._add_connection(self.chat_uid)
@@ -84,8 +91,12 @@ class WebsocketChatManager:
             raise WebSocketException(status.WS_1007_INVALID_FRAME_PAYLOAD_DATA, "Invalid JSON")
         except exceptions.ChatNotFoundError:
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Chat not found")
+        except exceptions.MessageNotFoundError:
+            raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Message not found")
         except exceptions.UserNotFoundError:
             raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "User not found")
+        except exceptions.PermissionDeniedDeleteMessageError:
+            raise WebSocketException(status.WS_1008_POLICY_VIOLATION, "Permission denied")
         except exceptions.FileQuotaSizeError:
             self._set_message_send(None)
             await self.answer_error_message(

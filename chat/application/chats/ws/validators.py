@@ -49,3 +49,9 @@ class SendMessage(BaseModel):
             raise ValueError("Для сообщения отсутствует контент.")
 
         return self
+
+
+class DeleteMessage(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    message_uid: UUID

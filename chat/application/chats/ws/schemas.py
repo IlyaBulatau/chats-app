@@ -12,3 +12,4 @@ class NewMessageData(TypedDict):
     chat_uid: UUID | None
     text: str | None
     file: FileData | None
+    message_uid: UUID | None
