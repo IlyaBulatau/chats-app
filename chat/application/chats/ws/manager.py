@@ -5,15 +5,17 @@ from uuid import UUID
 
 from fastapi import WebSocket, WebSocketException, status
 
-from application.chats.ws import exceptions
+from application.chats import exceptions
+from application.chats.schemas import NewMessageData
+from application.chats.services.files import FileMessageCreator
+from application.chats.services.messages import MessageCreator, MessageRemover
+from application.chats.validators import SendMessage
 from application.chats.ws.events import WebSocketChatEvent
 from application.chats.ws.handlers import (
     BaseMessageHandler,
     DeleteMessageHandler,
     NewMessageHandler,
 )
-from application.chats.ws.schemas import NewMessageData
-from application.chats.ws.validators import SendMessage
 from core.constants import USER_FILES_QUOTA_MB
 from core.domains import Chat, User
 from infrastructure.repositories.chats import ChatRepository
@@ -64,10 +66,17 @@ class WebsocketChatManager:
 
         self.EVENT_HANDLERS: dict[str, BaseMessageHandler] = {
             WebSocketChatEvent.NEW_MESSAGE: NewMessageHandler(
-                self.chat_repository, self.user_repository, self.file_storage, self.current_user
+                MessageCreator(
+                    user_repository,
+                    message_repository,
+                    chat_repository,
+                    file_storage,
+                    FileMessageCreator(file_storage),
+                ),
+                self.current_user,
             ),
             WebSocketChatEvent.DELETE_MESSAGE: DeleteMessageHandler(
-                self.current_user, self.message_repository
+                MessageRemover(message_repository), self.current_user
             ),
         }
 

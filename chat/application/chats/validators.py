@@ -5,6 +5,8 @@ from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class ReceivedFile(BaseModel):
+    """Данные полученного файлового сообщения от клиента."""
+
     model_config = ConfigDict(extra="ignore")
 
     filename: str
@@ -12,6 +14,8 @@ class ReceivedFile(BaseModel):
 
 
 class SendFile(BaseModel):
+    """Данные отправляемого файлового сообщения для клиента."""
+
     model_config = ConfigDict(extra="ignore")
 
     name: str
@@ -20,6 +24,8 @@ class SendFile(BaseModel):
 
 
 class ReceivedMessage(BaseModel):
+    """Данные полученного сообщения от клиента."""
+
     model_config = ConfigDict(extra="ignore")
 
     chat_uid: UUID
@@ -36,6 +42,8 @@ class ReceivedMessage(BaseModel):
 
 
 class SendMessage(BaseModel):
+    """Данные отправляемого сообщения для клиента."""
+
     model_config = ConfigDict(extra="ignore")
 
     chat_uid: UUID
@@ -52,6 +60,8 @@ class SendMessage(BaseModel):
 
 
 class DeleteMessage(BaseModel):
+    """Данные полученного сообщения от клиента для удаления сообщения."""
+
     model_config = ConfigDict(extra="ignore")
 
     message_uid: UUID
