@@ -53,7 +53,7 @@ async def remove_message_with_file(file_path: str, owner_id: int) -> None:
 
     file_info = await storage.get_object_info(file_path)
 
-    file_size_bytes = int(file_info["ResponseMetadata"]["HTTPHeaders"]["content-length"])
+    file_size_bytes = int(file_info["ContentLength"])
     file_size_mb = calculate_file_size_from_bytes_to_mb(file_size_bytes)
 
     async with database.get_connection() as connection:

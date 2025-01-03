@@ -1,4 +1,5 @@
 from infrastructure.storages.client import s3_client
+from infrastructure.storages.schemas import StorageObjectInfoResponse
 from settings import S3_SETTINGS
 
 
@@ -40,12 +41,12 @@ class FileStorage:
         async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
             await client.delete_object(Bucket=self._bucket, Key=path)
 
-    async def get_object_info(self, path: str) -> dict:
+    async def get_object_info(self, path: str) -> StorageObjectInfoResponse:
         """Получить информацию о файле в S3 хранилище.
 
         :param `str` path: Путь к файлу.
 
-        :return `dict`: Информация о файле.
+        :return `StorageObjectInfoResponse`: Информация о файле.
         """
         async with self._client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
             return await client.head_object(Bucket=self._bucket, Key=path)
