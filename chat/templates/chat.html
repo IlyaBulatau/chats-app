@@ -96,7 +96,7 @@
     
     function addMessage(message) {
         const messageElem = document.createElement("div");
-        
+
         if (message.error) {
             alert(message.error);
             loadingIndicator.style.display = 'none';
@@ -139,11 +139,35 @@
                     messageElem.appendChild(fileLink);
                 }
             }
+
+            messageElem.dataset.messageUid = message.uid;
             
             const username = document.createElement("div");
             username.className = "nickname ms-2";
             username.textContent = "Вы";
             messageElem.appendChild(username);
+
+            const deleteIcon = document.createElement("i");
+            deleteIcon.dataset.messageUid = message.uid;
+            deleteIcon.style.cursor = "pointer";
+            deleteIcon.className = "bi bi-trash ms-2 text-danger";
+            deleteIcon.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Вы уверены?',
+                    text: "Сообщение будет удалено!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Да',
+                    cancelButtonText: 'Отмена'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteMessage(deleteIcon.dataset.messageUid);
+                    }
+                });
+            });
+            messageElem.appendChild(deleteIcon);
         } else {
             messageElem.className = "message sender-message mb-2 d-flex align-items-start";
 
@@ -213,6 +237,21 @@
         const messageData = JSON.parse(event.data);
         addMessage(messageData)
     };
+
+    function deleteMessage(messageUid) {
+        const messageElems = chatBox.getElementsByClassName("receiver-message");
+        for (const messageElem of messageElems) {
+            if (messageElem.dataset.messageUid === messageUid) {
+                messageElem.remove();
+                break;
+            }
+        }
+        const message = {
+            "event": "delete_message",
+            "message_uid": messageUid,
+        };
+        socket.send(JSON.stringify(message));
+    }
 
     function sendMessage() {
         const input = document.getElementById('message-input');
