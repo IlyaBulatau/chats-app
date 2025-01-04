@@ -4,7 +4,6 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from application.auth.dependencies import get_current_user
 from application.chats.services.chats import ChatCreator, ChatReader
 from application.chats.services.messages import MessageReader
 from core.domains import User
@@ -12,11 +11,12 @@ from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
 from infrastructure.storages.s3 import FileStorage
+from presentation.html.dependencies import get_current_user
 from settings import BASE_DIR
 from shared.dependencies import get_repository
 
 
-router = APIRouter(tags=["chats"], prefix="/chats")
+router = APIRouter(prefix="/chats", include_in_schema=False)
 templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 

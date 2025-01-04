@@ -3,7 +3,6 @@ from fastapi.requests import Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from application.auth.dependencies import get_current_user
 from application.auth.forms import AuthorizationForm, RegisterForm
 from application.auth.oauth.constants import Providers
 from application.auth.oauth.dispatch import get_oauth_provider
@@ -14,11 +13,12 @@ from application.dto.users import UserOAuthCreateDTO
 from core.domains import User
 from core.exceptions import CustomException
 from infrastructure.repositories.users import UserRepository
+from presentation.html.dependencies import get_current_user
 from settings import BASE_DIR
 from shared.dependencies import get_repository
 
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter(prefix="/auth", include_in_schema=False)
 templates = Jinja2Templates(BASE_DIR.joinpath("templates"))
 
 

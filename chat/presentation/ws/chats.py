@@ -3,13 +3,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-from application.auth.dependencies import get_current_user
 from application.chats.ws.manager import WebsocketChatManager
 from core.domains import User
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
 from infrastructure.storages.s3 import FileStorage
+from presentation.html.dependencies import get_current_user
 from shared.dependencies import get_repository
 
 
