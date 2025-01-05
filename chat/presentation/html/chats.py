@@ -37,10 +37,11 @@ async def create_chat(
     request: Request,
     current_user: User = Depends(get_current_user),
     chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
+    user_repository: UserRepository = Depends(get_repository(UserRepository)),
     companion_id: int = Form(description="ID пользователя с которым создать чат"),
     redirect_url_for: str = "get_chat_by_id",
 ):
-    chat_creator = ChatCreator(chat_repository)
+    chat_creator = ChatCreator(chat_repository, user_repository)
 
     chat_id: int = await chat_creator.create(current_user.id, companion_id)
 
@@ -56,9 +57,9 @@ async def get_chat_by_id(
     current_user: User = Depends(get_current_user),
     chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
 ):
-    chat_reader = ChatReader(chat_repository, current_user)
+    chat_reader = ChatReader(chat_repository)
 
-    chat_info = await chat_reader.get_chat_info_by_id(chat_id)
+    chat_info = await chat_reader.get_chat_info_by_id(chat_id, current_user)
 
     if not chat_info:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -80,8 +81,9 @@ async def get_messages_by_chat_id(
     chat_id: int,
     current_user: User = Depends(get_current_user),  # noqa: ARG001
     message_repository: MessageRepository = Depends(get_repository(MessageRepository)),
+    chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
     file_storage: FileStorage = Depends(FileStorage),
 ):
-    message_reader = MessageReader(message_repository, file_storage)
+    message_reader = MessageReader(message_repository, chat_repository, file_storage)
 
-    return await message_reader.get_messages_from_db(chat_id)
+    return await message_reader.get_messages_from_db(chat_id, current_user)

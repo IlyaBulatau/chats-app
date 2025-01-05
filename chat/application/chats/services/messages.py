@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 
 from application.backgroud_tasks.tasks import remove_message_with_file, save_new_chat_message_in_db
 from application.chats import exceptions
-from application.chats.checkers import is_message_sender
+from application.chats.checkers import is_chat_member, is_message_sender
 from application.chats.schemas import FileData
 from application.chats.services.files import FileMessageCreator
 from application.chats.validators import SendFile, SendMessage
@@ -17,6 +17,7 @@ from application.files.files import (
 )
 from application.users.files_quota import is_available_user_quota_for_file
 from core.domains import User
+from core.exceptions import ChatNotFound, IsNotChatMember
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
@@ -29,17 +30,34 @@ logger = logging.getLogger("uvicorn")
 class MessageReader:
     """Читатель сообщений."""
 
-    def __init__(self, message_repository: MessageRepository, flie_storage: FileStorage):
+    def __init__(
+        self,
+        message_repository: MessageRepository,
+        chat_repository: ChatRepository,
+        flie_storage: FileStorage,
+    ):
         self.message_repository = message_repository
+        self.chat_repository = chat_repository
         self.file_storage = flie_storage
 
-    async def get_messages_from_db(self, chat_id: int) -> list[MessageReadDTO] | None:
+    async def get_messages_from_db(
+        self, chat_id: int, chat_member: User
+    ) -> list[MessageReadDTO] | None:
         """Получить сообщения из базы данных.
 
         :param int chat_id: ID чата.
 
         :return list[`MessageReadDTO`] | None: Список сообщений.
         """
+
+        chat_info = await self.chat_repository.get_by_id(chat_id)
+
+        if not chat_info:
+            raise ChatNotFound(field="chat_id")
+
+        if not is_chat_member(chat_member, chat_info.chat):
+            raise IsNotChatMember()
+
         messages = await self.message_repository.get_many_by_chat_id(chat_id)
 
         if not messages:
