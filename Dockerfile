@@ -7,6 +7,7 @@ ENV \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VERSION=1.8.0 \
     POETRY_HOME='/usr/local' \
     PATH="$HOME/.local/bin:$PATH"
 
@@ -18,7 +19,7 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=$POETRY_VERSION python3 -
 
 WORKDIR $POETRY_HOME
 
