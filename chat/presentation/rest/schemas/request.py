@@ -13,7 +13,7 @@ class RegistrationRequestSchema(BaseModel):
 class AuthorizationRequestSchema(BaseModel):
     """Схема запроса авторизации."""
 
-    username: str = Field(description="Имя пользователя")
+    email: str = Field(description="Email пользователя")
     password: str = Field(description="Пароль")
 
 
