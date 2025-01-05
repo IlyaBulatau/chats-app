@@ -4,7 +4,9 @@ import uuid
 from application.chats.checkers import is_chat_member
 from application.dto.chats import ChatInfoDTO, ChatReadDTO
 from core.domains import User
+from core.exceptions import ChatNotFound, CompanionNotExists, IsNotChatMember
 from infrastructure.repositories.chats import ChatRepository
+from infrastructure.repositories.users import UserRepository
 
 
 logger = logging.getLogger("uvicorn")
@@ -13,8 +15,9 @@ logger = logging.getLogger("uvicorn")
 class ChatCreator:
     """Класс для создания чата."""
 
-    def __init__(self, chat_repository: ChatRepository) -> None:
+    def __init__(self, chat_repository: ChatRepository, user_repository: UserRepository) -> None:
         self.chat_repository = chat_repository
+        self.user_repository = user_repository
 
     async def create(self, creator_id: int, companion_id: int) -> int:
         """Создает чат если он не существует. Возвращает ID чата.
@@ -29,6 +32,11 @@ class ChatCreator:
 
         if existing_chat:
             return existing_chat.id
+
+        existing_companion_chat = await self.user_repository.get_by("id", companion_id)
+
+        if not existing_companion_chat:
+            raise CompanionNotExists(field="companion_id")
 
         chat_id: int = await self.chat_repository.add(
             uid=uuid.uuid4(), creator_id=creator_id, companion_id=companion_id
@@ -67,11 +75,10 @@ class ChatCreator:
 class ChatReader:
     """Класс для получения информации о чате."""
 
-    def __init__(self, chat_repository: ChatRepository, member: User) -> None:
+    def __init__(self, chat_repository: ChatRepository) -> None:
         self.chat_repository = chat_repository
-        self.member = member
 
-    async def get_chat_info_by_id(self, chat_id: int) -> ChatInfoDTO | None:
+    async def get_chat_info_by_id(self, chat_id: int, chat_member: User) -> ChatInfoDTO:
         """
         Получить чат по ID. Если чат не существует или
         текущего пользователя нету в чате, вернуть None.
@@ -83,9 +90,9 @@ class ChatReader:
         chat_info = await self.chat_repository.get_by_id(chat_id)
 
         if not chat_info:
-            return None
+            raise ChatNotFound(field="chat_id")
 
-        if not is_chat_member(self.member, chat_info.chat):
-            return None
+        if not is_chat_member(chat_member, chat_info.chat):
+            raise IsNotChatMember()
 
         return chat_info

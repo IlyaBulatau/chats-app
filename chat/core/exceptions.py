@@ -33,3 +33,15 @@ class AccountNotExists(CustomException):
 
 class IsExistsUser(CustomException):
     message = "Пользователь уже существует"
+
+
+class CompanionNotExists(CustomException):
+    message = "Собеседник не найден"
+
+
+class ChatNotFound(CustomException):
+    message = "Чат не найден"
+
+
+class IsNotChatMember(CustomException):
+    message = "Вы не являетесь участником чата"

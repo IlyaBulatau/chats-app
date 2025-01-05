@@ -1,0 +1,2 @@
+class APIUnauthorizedError(Exception):
+    pass

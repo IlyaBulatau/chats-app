@@ -9,7 +9,10 @@ from settings import SESSION_SETTINGS
 
 
 class AddCurrentUserToRequestMiddleware(BaseHTTPMiddleware):
-    """Добавляет обьект авторизованного пользователя к обьекту запроса."""
+    """
+    Добавляет обьект авторизованного пользователя к обьекту запроса.
+    Нужно для получения текущего пользователя в html шаблонах.
+    """
 
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
