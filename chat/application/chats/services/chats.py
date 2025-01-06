@@ -1,10 +1,10 @@
 import logging
 import uuid
 
-from application.chats.checkers import is_chat_member
 from application.dto.chats import ChatInfoDTO, ChatReadDTO
 from core.domains import User
 from core.exceptions import ChatNotFound, CompanionNotExists, IsNotChatMember
+from core.use_cases.chats.members import is_chat_member
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.users import UserRepository
 

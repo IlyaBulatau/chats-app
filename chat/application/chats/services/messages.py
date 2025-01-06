@@ -4,7 +4,6 @@ from uuid import UUID, uuid4
 
 from application.backgroud_tasks.tasks import remove_message_with_file, save_new_chat_message_in_db
 from application.chats import exceptions
-from application.chats.checkers import is_chat_member, is_message_sender
 from application.chats.schemas import FileData
 from application.chats.services.files import FileMessageCreator
 from application.chats.validators import SendFile, SendMessage
@@ -15,9 +14,11 @@ from application.files.files import (
     get_file_type,
     get_filename,
 )
-from application.users.files_quota import is_available_user_quota_for_file
 from core.domains import User
 from core.exceptions import ChatNotFound, IsNotChatMember
+from core.use_cases.chats.members import is_chat_member
+from core.use_cases.messages.senders import is_message_sender
+from core.use_cases.users.files_quota import is_available_user_quota_for_file
 from infrastructure.repositories.chats import ChatRepository
 from infrastructure.repositories.messages import MessageRepository
 from infrastructure.repositories.users import UserRepository
