@@ -1,10 +1,12 @@
+from aioboto3 import Session
+
 from infrastructure.storages.client import s3_client
 from infrastructure.storages.schemas import StorageObjectInfoResponse
 from settings import S3_SETTINGS
 
 
 class FileStorage:
-    _client = s3_client
+    _client: Session = s3_client
     _bucket = S3_SETTINGS.bucket
 
     async def upload(self, file: bytes, path: str, **options) -> None:
