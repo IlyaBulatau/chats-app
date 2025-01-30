@@ -13,7 +13,7 @@ async def init_bucket() -> None:
         async with s3_client.client(service_name="s3", endpoint_url=S3_SETTINGS.url) as client:
             await client.create_bucket(Bucket=S3_SETTINGS.bucket)
             logger.info(f"Bucket {S3_SETTINGS.bucket} created")
-    except client.exceptions.BucketAlreadyOwnedByYou:
+    except (client.exceptions.BucketAlreadyOwnedByYou, client.exceptions.BucketAlreadyExists):
         logger.error(f"Bucket {S3_SETTINGS.bucket} already exists")
 
 
