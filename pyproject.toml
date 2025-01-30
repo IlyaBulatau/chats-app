@@ -24,6 +24,7 @@ taskiq-aio-pika = "^0.4.1"
 pyyaml = "^6.0.2"
 aioboto3 = "^13.3.0"
 python-slugify = "^8.0.4"
+dependency-injector = "^4.45.0"
 
 
 [tool.poetry.group.test.dependencies]
@@ -38,6 +39,7 @@ ruff = "^0.4.1"
 pre-commit = "^3.7.0"
 mypy = "^1.13.0"
 types-aioboto3 = "^13.3.0"
+debugpy = "^1.8.12"
 
 [build-system]
 requires = ["poetry-core"]

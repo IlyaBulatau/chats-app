@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Remote Attach",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}/chat",
+                    "remoteRoot": "/home/app"
+                },
+                {
+                    "localRoot": "${env:VIRTUAL_ENV}/lib/python3.10/site-packages",
+                    "remoteRoot": "/usr/local/lib/python3.10/site-packages"
+                }
+            ],
+            "justMyCode": false
+        }
+    ]
+}
