@@ -37,7 +37,7 @@ WORKDIR $POETRY_HOME
 
 RUN poetry install --no-ansi --only dev
 
-WORKDIR /home/code
+WORKDIR /home/app
 
 COPY ./chat .
 
@@ -51,7 +51,7 @@ WORKDIR $POETRY_HOME
 
 RUN poetry install --no-ansi --only test
 
-WORKDIR /home/code
+WORKDIR /home/app
 
 COPY ./chat .
 
@@ -61,7 +61,7 @@ FROM builder as production
 
 COPY --from=builder $POETRY_HOME $POETRY_HOME
 
-WORKDIR /home/code
+WORKDIR /home/app
 
 COPY ./chat .
 
