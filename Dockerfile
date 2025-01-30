@@ -71,7 +71,7 @@ RUN chmod +x ./entrypoint.sh
 
 RUN groupadd -r app && \
     useradd -r -g app app && \
-    chown -R app:app /home/code
+    chown -R app:app /home/app
 
 USER app
 
