@@ -35,11 +35,11 @@ class MessageReader:
         self,
         message_repository: MessageRepository,
         chat_repository: ChatRepository,
-        flie_storage: FileStorage,
+        file_storage: FileStorage,
     ):
         self.message_repository = message_repository
         self.chat_repository = chat_repository
-        self.file_storage = flie_storage
+        self.file_storage = file_storage
 
     async def get_messages_from_db(
         self, chat_id: int, chat_member: User

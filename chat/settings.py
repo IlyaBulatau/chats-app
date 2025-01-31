@@ -75,16 +75,6 @@ class BrokerSettings(BaseSettings):
 BROKER_SETTINGS = BrokerSettings()
 
 
-class AppSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-
-    cors_allow_origins: list[str] = ["*"]
-    debug: bool = False
-
-
-APP_SETTINGS = AppSettings()
-
-
 class S3Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="S3_", env_file=".env", extra="ignore")
 
@@ -98,3 +88,19 @@ class S3Settings(BaseSettings):
 S3_SETTINGS = S3Settings()
 
 WS_CHAT_CONNECTIONS: dict[UUID, set[WebSocket]] = {}
+
+
+class AppSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    cors_allow_origins: list[str] = ["*"]
+    debug: bool = False
+
+    database: DatabaseSettings = DB_SETTINGS
+    session: SessionSettings = SESSION_SETTINGS
+    google_oauth: GoogleOAuthSettings = GOOGLE_OAUTH_SETTINGS
+    broker: BrokerSettings = BROKER_SETTINGS
+    s3: S3Settings = S3_SETTINGS
+
+
+APP_SETTINGS = AppSettings()

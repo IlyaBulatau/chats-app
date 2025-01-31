@@ -24,6 +24,17 @@ class PostgresDB(BaseDatabase, metaclass=Singleton):
         async with self._pool.acquire() as conn:
             yield conn
 
+    async def get_connection_for_di(self) -> AsyncGenerator[Connection, None] | NoReturn:
+        """Получение соединения к базе данных из пулла.
+
+        :return `asyncpg.Connection`: Соедение с базой.
+        """
+        if not self._init:
+            raise Exception("База данных не проиницилизирована")
+
+        async with self._pool.acquire() as conn:
+            yield conn
+
     async def close_connection(self) -> None:
         """Закрытие всех соединений пулла."""
         if not self._init:

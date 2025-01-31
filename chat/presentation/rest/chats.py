@@ -1,13 +1,11 @@
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Path, status
 
 from application.chats.services.chats import ChatCreator, ChatReader
 from application.chats.services.messages import MessageReader
+from containers import Container
 from core.domains import User
 from core.exceptions import ChatNotFound, CustomException, IsNotChatMember
-from infrastructure.repositories.chats import ChatRepository
-from infrastructure.repositories.messages import MessageRepository
-from infrastructure.repositories.users import UserRepository
-from infrastructure.storages.s3 import FileStorage
 from presentation.rest.dependencies import get_current_user_api
 from presentation.rest.representations import exception_representation, success_representation
 from presentation.rest.schemas.request import CreateChatRequestSchema
@@ -17,7 +15,6 @@ from presentation.rest.schemas.response import (
     ReceiveChatInfoResponseSchema,
     ReceiveMessagesResponseSchema,
 )
-from shared.dependencies import get_repository
 
 
 router = APIRouter(prefix="/api/v1/chats", tags=["Чаты"])
@@ -39,15 +36,13 @@ router = APIRouter(prefix="/api/v1/chats", tags=["Чаты"])
         },
     },
 )
+@inject
 async def create_chat(
     create_data: CreateChatRequestSchema,
     current_user: User = Depends(get_current_user_api),
-    chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
-    user_repository: UserRepository = Depends(get_repository(UserRepository)),
+    chat_creator: ChatCreator = Depends(Provide[Container.chat_creator]),
 ):
     """Создание чата, если чат уже создан, то возвращает ID чата."""
-
-    chat_creator = ChatCreator(chat_repository, user_repository)
 
     try:
         chat_id: int = await chat_creator.create(current_user.id, create_data.companion_id)
@@ -75,13 +70,12 @@ async def create_chat(
         },
     },
 )
+@inject
 async def get_chat_info_by_id(
     chat_id: int = Path(description="ID чата"),
     current_user: User = Depends(get_current_user_api),
-    chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
+    chat_reader: ChatReader = Depends(Provide[Container.chat_reader]),
 ):
-    chat_reader = ChatReader(chat_repository)
-
     try:
         chat_info = await chat_reader.get_chat_info_by_id(chat_id, current_user)
     except ChatNotFound as exc:
@@ -116,15 +110,13 @@ async def get_chat_info_by_id(
         },
     },
 )
+@inject
 async def get_messages_by_chat_id(
     chat_id: int,
     current_user: User = Depends(get_current_user_api),
-    message_repository: MessageRepository = Depends(get_repository(MessageRepository)),
-    chat_repository: ChatRepository = Depends(get_repository(ChatRepository)),
-    file_storage: FileStorage = Depends(FileStorage),
+    message_reader: MessageReader = Depends(Provide[Container.message_reader]),
 ):
     """Получение сообщений чата."""
-    message_reader = MessageReader(message_repository, chat_repository, file_storage)
 
     try:
         messages = await message_reader.get_messages_from_db(chat_id, current_user)

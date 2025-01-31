@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from application.auth.middlewares import AddCurrentUserToRequestMiddleware
 from application.backgroud_tasks.broker import broker
+from containers import Container
 from infrastructure.databases import database
 from presentation.html.auth import router as auth_html_router
 from presentation.html.chats import router as chats_html_router
@@ -33,6 +34,8 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
     logger.info("App started")
 
     yield
+
+    await app.container.db_connection.shutdown()  # type: ignore
 
     if broker.is_worker_process:
         await broker.shutdown()
@@ -67,6 +70,10 @@ app = FastAPI(
         "- Квота на размер отправленных файлов пользователем.\n"
     ),
 )
+
+container = Container()
+container.config.from_pydantic(APP_SETTINGS)
+app.container = container  # type: ignore
 
 app.mount("/static", StaticFiles(directory=BASE_DIR.joinpath("static")), name="static")
 
