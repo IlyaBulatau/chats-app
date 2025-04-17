@@ -8,8 +8,12 @@ ENV \
     POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_VERSION=1.8.0 \
-    POETRY_HOME='/usr/local' \
-    PATH="$HOME/.local/bin:$PATH"
+    POETRY_HOME='/opt/local' \
+    PATH="/opt/local/bin:$PATH"
+
+WORKDIR $POETRY_HOME
+
+COPY pyproject.toml ./
 
 RUN apt-get update && apt-get install --no-install-recommends --no-install-suggests -y \
     gcc \
@@ -17,15 +21,13 @@ RUN apt-get update && apt-get install --no-install-recommends --no-install-sugge
     libpq-dev \
     curl && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=$POETRY_VERSION python3 -
-
-WORKDIR $POETRY_HOME
-
-COPY pyproject.toml ./
-
-RUN poetry install --no-ansi --only main
+    curl -sSL https://install.python-poetry.org | POETRY_VERSION=$POETRY_VERSION python3 - && \
+    poetry install --no-ansi --only main && \
+    apt-get purge -y gcc python3-dev libpq-dev curl && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    poetry cache clear --all --no-interaction PyPI && \
+    poetry cache clear --all --no-interaction _default_cache
 
 # ---------------------------------------------------------------------------
 # development stage

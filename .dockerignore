@@ -1,2 +1,6 @@
-.env
 googleCreds.json
+**/__pycache__
+**/*.pyc
+**/.git
+**/.env
+**/tests
